@@ -63,19 +63,33 @@ public class RandomPlayer extends mosquito.sim.Player {
 
 		lights = new HashSet<Light>();
 		Random r = new Random();
-		for(int i = 0; i<numLights;i++)
-		{
-			// this player just picks random points for the Light
-			lastLight = new Point2D.Double(r.nextInt(100), r.nextInt(100));
+//		for(int i = 0; i<numLights;i++)
+//		{
+//			// this player just picks random points for the Light
+//			lastLight = new Point2D.Double(r.nextInt(100), r.nextInt(100));
+//			
+//			/*
+//			 * The arguments to the Light constructor are: 
+//			 * - X coordinate
+//			 * - Y coordinate
+//			 * - whether or not the light is on
+//			 */
+//			MoveableLight l = new MoveableLight(lastLight.getX(),lastLight.getY(), true);
+//
+//			log.trace("Positioned a light at (" + lastLight.getX() + ", " + lastLight.getY() + ")");
+//			lights.add(l);
+//		}
+		
+		for(int i = 0; i < numLights; i++) {
+			if (i > 5) {
+				lastLight = new Point2D.Double((21 + i*60) % 100, 0);
+			} else {
+				lastLight = new Point2D.Double((20 + i*60) % 100, 0);
+			}
 			
-			/*
-			 * The arguments to the Light constructor are: 
-			 * - X coordinate
-			 * - Y coordinate
-			 * - whether or not the light is on
-			 */
-			MoveableLight l = new MoveableLight(lastLight.getX(),lastLight.getY(), true);
-
+			
+			MoveableLight l = new MoveableLight(lastLight.getX(), lastLight.getY(), true);
+			
 			log.trace("Positioned a light at (" + lastLight.getX() + ", " + lastLight.getY() + ")");
 			lights.add(l);
 		}
@@ -94,25 +108,40 @@ public class RandomPlayer extends mosquito.sim.Player {
 		
 		Random r = new Random();
 
-		for (Light l : lights) {
+//		for (Light l : lights) {
+//			MoveableLight ml = (MoveableLight)l;
+//
+//			// randomly move it in one direction
+//			// these methods return true if the move is allowed, false otherwise
+//			// a move is not allowed if it would go beyond the world boundaries
+//			// you can get the light's position with getX() and getY()
+//			switch (r.nextInt(4)) {
+//			case 0: ml.moveUp(); break;
+//			case 1: ml.moveDown(); break;
+//			case 2: ml.moveLeft(); break;
+//			case 3: ml.moveRight(); break;
+//			}
+//
+//			// randomly turn the light off or on
+//			// you don't have to call these each time, of course: a light that's on stays on
+//			// you can query the state of the light with the isOn() method
+//			if (r.nextInt(2) == 0) ml.turnOff();
+//			else ml.turnOn();
+//		}
+		
+		for(Light l : lights) {
 			MoveableLight ml = (MoveableLight)l;
-
-			// randomly move it in one direction
-			// these methods return true if the move is allowed, false otherwise
-			// a move is not allowed if it would go beyond the world boundaries
-			// you can get the light's position with getX() and getY()
-			switch (r.nextInt(4)) {
-			case 0: ml.moveUp(); break;
-			case 1: ml.moveDown(); break;
-			case 2: ml.moveLeft(); break;
-			case 3: ml.moveRight(); break;
+			if (ml.getY() < 100) {
+				ml.moveDown();
+			} else {
+				if (ml.getX() > 50) {
+					ml.moveLeft();
+				} else if (ml.getX() < 50) {
+					ml.moveRight();
+				} else {
+					ml.moveUp();
+				}
 			}
-
-			// randomly turn the light off or on
-			// you don't have to call these each time, of course: a light that's on stays on
-			// you can query the state of the light with the isOn() method
-			if (r.nextInt(2) == 0) ml.turnOff();
-			else ml.turnOn();
 		}
 		
 		return lights;
@@ -125,7 +154,8 @@ public class RandomPlayer extends mosquito.sim.Player {
 	@Override
 	public Collector getCollector() {
 		// this one just places a collector next to the last light that was added
-		Collector c = new Collector(lastLight.getX()+1,lastLight.getY() +1);
+//		Collector c = new Collector(lastLight.getX()+1,lastLight.getY() +1);
+		Collector c = new Collector(50, 100);
 		log.debug("Positioned a Collector at (" + (lastLight.getX()+1) + ", " + (lastLight.getY()+1) + ")");
 		return c;
 	}

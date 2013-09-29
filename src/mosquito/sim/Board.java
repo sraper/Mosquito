@@ -457,7 +457,7 @@ public final class Board {
 	private void init() {
 		powerUsed = 0;
 		allPoints = new ArrayList<ArrayList<Point2D>>();
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 10; i++) {
 			allPoints.add(new ArrayList<Point2D>());
 		}
 
