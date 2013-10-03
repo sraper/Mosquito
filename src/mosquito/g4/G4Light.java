@@ -1,5 +1,7 @@
 package mosquito.g4;
 
+import java.awt.geom.Point2D.Double;
+
 import mosquito.sim.MoveableLight;
 
 import org.apache.log4j.Logger;
@@ -17,9 +19,10 @@ public class G4Light extends MoveableLight {
     private double dest_x;
     private double dest_y;
 
-    public G4Light(double x, double y, boolean on, int id,
-            LightQuadrantTracker tracker) {
-        super(x, y, on);
+    private Double collectorLocation;
+
+    public G4Light(double x, double y, int id, LightQuadrantTracker tracker) {
+        super(x, y, true);
         this.id = id;
         this.tracker = tracker;
         setDestination(x, y, NextDestination.Quadrant);
@@ -82,6 +85,11 @@ public class G4Light extends MoveableLight {
                 turnOff();
             }
         }
+    }
+
+    public void setCollectorPoint(Double location) {
+        this.collectorLocation = location;
+
     }
 }
 

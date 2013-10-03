@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Quadrant {
 
-    static final int NUM_QUADRANTS = 16;
+    static final int NUM_QUADRANTS = 9;
     private static final int NUM_COLUMNS = (int) Math.sqrt(NUM_QUADRANTS);
     private static final int HEIGHT = 100;
     private static final int HEIGHT_PER_QUADRANT = HEIGHT / NUM_COLUMNS;

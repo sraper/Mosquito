@@ -83,8 +83,8 @@ public class G4Player extends mosquito.sim.Player {
         // population.population, population.quadrant, center.getX(),
         // center.getY()));
 
-        G4Light light = new G4Light(center.getX(), center.getY(), true, i,
-                tracker);
+        G4Light light = new G4Light(center.getX(), center.getY(), i, tracker);
+        light.setCollectorPoint(this.collector);
         return light;
     }
 
