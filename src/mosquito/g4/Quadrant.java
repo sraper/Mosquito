@@ -6,16 +6,21 @@ import java.util.List;
 
 public class Quadrant {
 
-    static final int NUM_QUADRANTS = 9;
+    static final int NUM_QUADRANTS = 16;
     private static final int NUM_COLUMNS = (int) Math.sqrt(NUM_QUADRANTS);
     private static final int HEIGHT = 100;
-    private static final int HEIGHT_PER_QUADRANT = HEIGHT / NUM_COLUMNS;
+    private static final double HEIGHT_PER_QUADRANT = HEIGHT
+            / (1.0 * NUM_COLUMNS);
 
     static int getQuadrant(double x, double y) {
         int column = (int) (x / HEIGHT_PER_QUADRANT);
         int row = (int) (y / HEIGHT_PER_QUADRANT);
 
         return row * NUM_COLUMNS + column;
+    }
+
+    static Point2D getCenter() {
+        return new Point2D.Double(HEIGHT / 2, HEIGHT / 2);
     }
 
     static Point2D getCenterOfQuadrant(int quadrant) {
@@ -38,10 +43,8 @@ public class Quadrant {
     public static void main(String[] args) {
         System.out.println(getQuadrant(0, 0) == 0);
         System.out.println(getQuadrant(24.999, 24.999) == 0);
-        System.out.println(getQuadrant(50, 24) == 2);
-        System.out.println(getCenterOfQuadrant(6).equals(
-                new Point2D.Double(62.5, 37.5)));
-        System.out.println(getCenterOfQuadrant(15).equals(
-                new Point2D.Double(87.5, 87.5)));
+        System.out.println(getQuadrant(0, 99) == 6);
+        System.out.println(getQuadrant(50, 24) == 1);
+        System.out.println(getCenterOfQuadrant(6));
     }
 }

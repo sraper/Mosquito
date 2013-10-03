@@ -7,6 +7,8 @@ import mosquito.sim.MoveableLight;
 import org.apache.log4j.Logger;
 
 public class G4Light extends MoveableLight {
+    private static final double DELTA = 0.9999;
+
     private static Logger log = Logger.getLogger(G4Light.class);
 
     boolean isClosestToCollector;
@@ -48,13 +50,13 @@ public class G4Light extends MoveableLight {
             // dest_x, dest_y, x, y, x - dest_x, y - dest_y));
 
             if (x - dest_x > 1) {
-                x--;
+                x -= DELTA;
             } else if (x - dest_x < -1) {
-                x++;
+                x += DELTA;
             } else if (y - dest_y > 1) {
-                y--;
+                y -= DELTA;
             } else if (y - dest_y < -1) {
-                y++;
+                y += DELTA;
             } else {
                 resetDest();
                 reachedDestination = true;

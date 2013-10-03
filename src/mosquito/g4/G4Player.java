@@ -127,7 +127,11 @@ public class G4Player extends mosquito.sim.Player {
     public int getNextQuadrant() {
         int quadrant;
         do {
-            quadrant = populationCounter.popTop().quadrant;
+            Population top = populationCounter.popTop();
+            if (top == null) {
+                return 0;
+            }
+            quadrant = top.quadrant;
         } while (quadrant == collectorPopulation.quadrant
                 || tracker.isQuadrantTaken(quadrant));
         return quadrant;
