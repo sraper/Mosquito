@@ -2,7 +2,6 @@ package mosquito.g4;
 
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-import java.awt.geom.Point2D.Double;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,13 +20,16 @@ public class G4Player extends mosquito.sim.Player {
     private PopulationCounter populationCounter;
     private Population collectorPopulation;
     private LightQuadrantTracker tracker;
+    private G4LightCollectorTracker lightCollectorTracker;
 
-    // NOT NEEDED, so far private int time;
-    private Double collector;
+    private Point2D.Double collectorLocation;
 
     public G4Player() {
         this.lights = new HashSet<Light>();
         this.populationCounter = new PopulationCounter();
+
+        initCollector();
+        this.lightCollectorTracker = new G4LightCollectorTracker(collectorLocation);
         tracker = new LightQuadrantTracker();
     }
 
@@ -67,7 +69,7 @@ public class G4Player extends mosquito.sim.Player {
 
         for (int i = 0; i < numLights; i++) {
             G4Light nextLight = getNextLight(i);
-            nextLight.isClosestToCollector = i == 0 && numLights > 1;
+            // nextLight.isClosestToCollector = i == 0 && numLights > 1;
             lights.add(nextLight);
         }
 
@@ -84,7 +86,7 @@ public class G4Player extends mosquito.sim.Player {
         // center.getY()));
 
         G4Light light = new G4Light(center.getX(), center.getY(), i, tracker);
-        light.setCollectorPoint(this.collector);
+        light.setCollectorPoint(this.collectorLocation);
         return light;
     }
 
@@ -97,6 +99,7 @@ public class G4Player extends mosquito.sim.Player {
      */
     public Set<Light> updateLights(int[][] board) {
         populationCounter.updatePopulation(board);
+        lightCollectorTracker.updateLights(lights);
 
         for (Light l : lights) {
             G4Light gl = (G4Light) l;
@@ -105,11 +108,12 @@ public class G4Player extends mosquito.sim.Player {
 
                 if (gl.nextDest == NextDestination.Collector) {
 
-                    gl.setDestination(collector.getX(), collector.getY(),
+                    gl.setDestination(collectorLocation.getX(), collectorLocation.getY(),
                             NextDestination.Collector);
 
-                } else if (!gl.isClosestToCollector
-                        && gl.nextDest == NextDestination.Quadrant) {
+                    // } else if (!gl.isClosestToCollector
+                    // && gl.nextDest == NextDestination.Quadrant) {
+                } else if (gl.nextDest == NextDestination.Quadrant) {
 
                     int quadrant = getNextQuadrant();
 
@@ -143,17 +147,21 @@ public class G4Player extends mosquito.sim.Player {
      */
     @Override
     public Collector getCollector() {
-        int quadrant = collectorPopulation.quadrant;
-        Point2D coordinate = Quadrant.getCenterOfQuadrant(quadrant);
+        return new Collector(collectorLocation.getX(), collectorLocation.getY());
+    }
 
-        double x = coordinate.getX();
-        double y = coordinate.getY();
-
-        this.collector = new Point2D.Double(x, y);
+    private void initCollector() {
+        // int quadrant = collectorPopulation.quadrant;
+        // Point2D coordinate = Quadrant.getCenterOfQuadrant(quadrant);
+        //
+        // double x = coordinate.getX();
+        // double y = coordinate.getY();
+        //
+        this.collectorLocation = Quadrant.getCenter();// new Point2D.Double(x, y);
 
         // log.debug(String.format(
         // "Most population at quadrant %d. Collector at <%f, %f>",
         // quadrant, x, y));
-        return new Collector(x + 1, y);
+        // return new Collector(x + 1, y);
     }
 }

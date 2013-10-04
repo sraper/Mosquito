@@ -7,11 +7,11 @@ import mosquito.sim.MoveableLight;
 import org.apache.log4j.Logger;
 
 public class G4Light extends MoveableLight {
-    private static final double DELTA = 0.9999;
+    private static final double DELTA = 1;
 
     private static Logger log = Logger.getLogger(G4Light.class);
 
-    boolean isClosestToCollector;
+    // boolean isClosestToCollector;
     boolean reachedDestination;
     int id;
 
@@ -22,6 +22,8 @@ public class G4Light extends MoveableLight {
     private double dest_y;
 
     private Double collectorLocation;
+
+    private boolean stayPut;
 
     public G4Light(double x, double y, int id, LightQuadrantTracker tracker) {
         super(x, y, true);
@@ -42,7 +44,7 @@ public class G4Light extends MoveableLight {
     }
 
     public void step() {
-        if (isDestSet()) {
+        if (isDestSet() && !stayPut) {
             double prev_x = x;
             double prev_y = y;
             // log.debug(String
@@ -80,18 +82,22 @@ public class G4Light extends MoveableLight {
         nextDest = nextDest == NextDestination.Collector ? NextDestination.Quadrant
                 : NextDestination.Collector;
 
-        if (!isClosestToCollector) {
-            if (nextDest == NextDestination.Collector) {
-                turnOn();
-            } else {
-                turnOff();
-            }
+        // if (!isClosestToCollector) {
+        if (nextDest == NextDestination.Collector) {
+            turnOn();
+        } else {
+            turnOff();
         }
+        // }
     }
 
     public void setCollectorPoint(Double location) {
         this.collectorLocation = location;
 
+    }
+
+    public void stayPut(boolean stayPut) {
+        this.stayPut = stayPut;
     }
 }
 

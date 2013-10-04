@@ -19,7 +19,7 @@ public class Quadrant {
         return row * NUM_COLUMNS + column;
     }
 
-    static Point2D getCenter() {
+    static Point2D.Double getCenter() {
         return new Point2D.Double(HEIGHT / 2, HEIGHT / 2);
     }
 
