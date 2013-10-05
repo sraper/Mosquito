@@ -2,6 +2,7 @@ package mosquito.g4.voronoi;
 
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,7 +14,7 @@ import mosquito.g4.utils.Utils;
  * Creates partitions of an n x n board so that each partition contains no
  * obstacles and is easily 'sweepable'. Each of these sections are convex in
  * nature to simplify the sweeping algorithm. The class stores the results in an
- * Sections object that orders each Section.
+ * Sections object that orders each Section based on population.
  * 
  * @author Hari
  * 
@@ -25,15 +26,19 @@ import mosquito.g4.utils.Utils;
 public class Voronoi {
     private static final double MIN_DISTANCE = 10;
     private Sections sections;
+    private List<Section> sectionsAsList;
+
     private int boardSize;
+
     private int minSections;
+    private int numSections;
+
     private Iterable<Line2D> walls;
     private Iterable<Point2D> voronoiPoints;
 
     int[][] sectionIdBoard;
     double[][] scoreBoard;
     private boolean debug;
-    private int numSections;
 
     public Voronoi(int minSections, int boardSize, Iterable<Line2D> walls) {
         this.minSections = minSections;
@@ -45,8 +50,8 @@ public class Voronoi {
         createVornoiPoints();
         setupBoards();
         calculateDistances();
-        printSectionBoard();
         createSections();
+        printSectionBoard();
     }
 
     private void createVornoiPoints() {
@@ -85,27 +90,36 @@ public class Voronoi {
             ++i;
         }
 
-        this.setNumSections(i - 1);
+        this.setNumSections(i);
     }
 
     private void calculateDistance(Point2D point, int sectionId) {
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
-
-                Point2D.Double target = new Point2D.Double(i, j);
-
-                if (Utils.hasStraightPath(point, target, walls)) {
-                    double distance = point.distance(i, j);
-
-                    if (sectionIdBoard[i][j] == -1
-                            || distance < scoreBoard[i][j]) {
-                        sectionIdBoard[i][j] = sectionId;
-                        scoreBoard[i][j] = distance;
-                    }
-                }
+                calculateDistance(point, sectionId, i, j);
             }
         }
+    }
 
+    private void calculateDistance(Point2D point, int sectionId,
+            List<Point2D> points) {
+        for (Point2D target : points) {
+            calculateDistance(point, sectionId, (int) target.getX(),
+                    (int) target.getY());
+        }
+    }
+
+    private void calculateDistance(Point2D point, int sectionId, int i, int j) {
+        Point2D target = new Point2D.Double(i, j);
+
+        if (Utils.hasStraightPath(point, target, walls)) {
+            double distance = point.distance(target);
+
+            if (sectionIdBoard[i][j] == -1 || distance < scoreBoard[i][j]) {
+                sectionIdBoard[i][j] = sectionId;
+                scoreBoard[i][j] = distance;
+            }
+        }
     }
 
     private void printSectionBoard() {
@@ -116,21 +130,60 @@ public class Voronoi {
 
     private void createSections() {
         this.sections = new Sections();
-        Section[] sections = new Section[getNumSections()];
+        sectionsAsList = new ArrayList<Section>(getNumSections());
 
-        for (int i = 0; i < sections.length; i++) {
+        // populate sections array
+        for (int i = 0; i < getNumSections(); i++) {
             Section section = new Section(i);
-            sections[i] = section;
-            this.sections.addSection(section);
+            sectionsAsList.add(section);
         }
 
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
-                int sectionId = this.sectionIdBoard[i][j];
-                sections[sectionId].addPoint(new Point2D.Double(i, j));
+                putPointInSection(i, j);
             }
         }
 
+        // add each sections to heap
+        for (int i = 0; i < sectionsAsList.size(); i++) {
+            this.sections.addSection(sectionsAsList.get(i));
+        }
+
+        while (getNumSections() < minSections) {
+            splitSection();
+        }
+
+        this.sections.setSectionBoard(sectionIdBoard);
+
+    }
+
+    public void putPointInSection(int i, int j) {
+        int sectionId = this.sectionIdBoard[i][j];
+        if (sectionId >= 0) {
+            sectionsAsList.get(sectionId).addPoint(new Point2D.Double(i, j));
+        }
+    }
+
+    private void splitSection() {
+        Section poppedSection = sections.pop();
+
+        List<Point2D> src = poppedSection.getPoints();
+        List<Point2D> points = new ArrayList<Point2D>(src);
+
+        Point2D nextVoronoiPoint = Utils.getRandomElement(points);
+        int nextSectionId = getNumSections();
+        sectionsAsList.add(new Section(nextSectionId));
+
+        calculateDistance(nextVoronoiPoint, nextSectionId, points);
+        poppedSection.clearPoints();
+
+        for (Point2D p : points) {
+            putPointInSection((int) p.getX(), (int) p.getY());
+        }
+
+        sections.addSection(sectionsAsList.get(getNumSections()));
+        sections.addSection(poppedSection);
+        setNumSections(getNumSections() + 1);
     }
 
     public Iterable<Point2D> getVoronoiPoints() {
@@ -151,25 +204,17 @@ public class Voronoi {
 
     private static void conditionallyAddPoint(List<java.awt.geom.Point2D> list,
             java.awt.geom.Point2D point, int minDim, int maxDim) {
-        if (withinBounds(minDim, maxDim, point.getX())
-                && withinBounds(minDim, maxDim, point.getY())) {
+        if (Utils.withinBounds(minDim, maxDim, point.getX())
+                && Utils.withinBounds(minDim, maxDim, point.getY())) {
             list.add(point);
         }
     }
 
-    public static boolean withinBounds(int minDim, int maxDim, double d) {
-        return d >= minDim && d <= maxDim;
-    }
-
     public static void main(String[] args) {
         Set<Line2D> walls = new HashSet<Line2D>();
-        walls.add(new Line2D.Double(25.0, 0, 25.0, 98.9));
+        walls.add(new Line2D.Double(50.1, 0, 49.9, 98.9));
         Voronoi v = new Voronoi(5, 100, walls);
         v.debug = true;
         v.doVoronoi();
-
-        // System.out.println(new Line2D.Double(25, 0, 25, 99)
-        // .intersectsLine(new Line2D.Double(20, 49.5, 25, 100)));
-
     }
 }

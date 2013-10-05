@@ -1,16 +1,16 @@
 package mosquito.g4.voronoi;
 
 import java.awt.geom.Point2D;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Section implements Comparable<Section> {
     private int id;
-    private Set<Point2D.Double> points;
+    private List<Point2D> points;
 
     public Section(int id) {
         setId(id);
-        points = new HashSet<Point2D.Double>();
+        points = new ArrayList<Point2D>();
     }
 
     public int getId() {
@@ -21,17 +21,23 @@ public class Section implements Comparable<Section> {
         this.id = id;
     }
 
-    public Set<Point2D.Double> getPoints() {
+    public List<Point2D> getPoints() {
         return points;
     }
 
-    public void addPoint(Point2D.Double point) {
+    public void clearPoints() {
+        getPoints().clear();
+    }
+
+    public void addPoint(Point2D point) {
         this.points.add(point);
     }
 
-    public boolean hasPoint(Point2D.Double point) {
-        return points.contains(point);
-    }
+    // FIXME: inefficient, so use it if we need it
+
+    // public boolean hasPoint(Point2D point) {
+    // return points.contains(point);
+    // }
 
     public Integer getPopulation() {
         return getPoints().size();
@@ -39,7 +45,7 @@ public class Section implements Comparable<Section> {
 
     @Override
     public int compareTo(Section o) {
-        return getPopulation().compareTo(o.getPopulation());
+        return -getPopulation().compareTo(o.getPopulation());
     }
 
     public int hashCode() {
