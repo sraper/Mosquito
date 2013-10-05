@@ -3,8 +3,11 @@ package mosquito.g4.utils;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.io.PrintStream;
+import java.util.List;
+import java.util.Random;
 
 public class Utils {
+    static Random r = new Random();
 
     public static boolean hasStraightPath(Point2D p1, Point2D p2,
             Iterable<Line2D> walls) {
@@ -44,13 +47,20 @@ public class Utils {
         return new Line2D.Double(x3, y3, x4, y4);
     }
 
+    public static boolean withinBounds(int minDim, int maxDim, double d) {
+        return d >= minDim && d <= maxDim;
+    }
+
     public static void print(PrintStream stream, int[][] array) {
-        // for (int i = array.length - 1; i >= 0; i--) {
         for (int i = 0; i < array.length; i++) {
             for (int j = 0; j < array[0].length; j++) {
                 stream.print(String.format("%d ", array[j][i]));
             }
             stream.println();
         }
+    }
+
+    public static <T> T getRandomElement(List<T> list) {
+        return list.get(r.nextInt(list.size()));
     }
 }
