@@ -3,6 +3,7 @@ package mosquito.g4.voronoi;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,17 +34,32 @@ public class Voronoi {
     private int minSections;
     private int numSections;
 
-    private Iterable<Line2D> walls;
-    private Iterable<Point2D> voronoiPoints;
+    private Collection<Line2D> walls;
+    private Collection<Point2D> voronoiPoints;
 
     int[][] sectionIdBoard;
     double[][] scoreBoard;
     private boolean debug;
 
-    public Voronoi(int minSections, int boardSize, Iterable<Line2D> walls) {
+    public Voronoi(int minSections, int boardSize, Collection<Line2D> walls) {
         this.minSections = minSections;
         this.boardSize = boardSize;
+        setupWalls(walls);
+    }
+
+    public void setupWalls(Collection<Line2D> walls) {
         this.walls = walls;
+
+        if (walls.isEmpty()) {
+            createDefaultWall();
+        }
+    }
+
+    public void createDefaultWall() {
+        List<Line2D> tempWall = new LinkedList<Line2D>();
+        tempWall.add(new Line2D.Double(0, 50.1, 100, 50.1));
+
+        this.walls = tempWall;
     }
 
     public void doVoronoi() {
@@ -190,7 +206,7 @@ public class Voronoi {
         return voronoiPoints;
     }
 
-    private void setVoronoiPoints(Iterable<Point2D> voronoiPoints) {
+    private void setVoronoiPoints(Collection<Point2D> voronoiPoints) {
         this.voronoiPoints = voronoiPoints;
     }
 
@@ -212,8 +228,8 @@ public class Voronoi {
 
     public static void main(String[] args) {
         Set<Line2D> walls = new HashSet<Line2D>();
-        walls.add(new Line2D.Double(50.1, 0, 49.9, 98.9));
-        Voronoi v = new Voronoi(5, 100, walls);
+        // walls.add(new Line2D.Double(50.1, 0, 49.9, 98.9));
+        Voronoi v = new Voronoi(2, 100, walls);
         v.debug = true;
         v.doVoronoi();
     }
