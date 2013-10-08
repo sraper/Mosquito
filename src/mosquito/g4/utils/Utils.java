@@ -3,8 +3,13 @@ package mosquito.g4.utils;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.io.PrintStream;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.Stack;
+
+import mosquito.g4.voronoi.LineParam;
 
 public class Utils {
     static Random r = new Random();
@@ -48,7 +53,7 @@ public class Utils {
     }
 
     public static boolean withinBounds(int minDim, int maxDim, double d) {
-        return d >= minDim && d <= maxDim;
+        return d >= minDim && d < maxDim;
     }
 
     public static void print(PrintStream stream, int[][] array) {
@@ -62,5 +67,37 @@ public class Utils {
 
     public static <T> T getRandomElement(List<T> list) {
         return list.get(r.nextInt(list.size()));
+    }
+
+    public static void print(PrintStream out, List<Line2D> lines) {
+        for (Line2D line : lines) {
+            out.println(line.getP1() + " " + line.getP2());
+        }
+    }
+
+    public static void addAll(Map<Integer, List<Point2D>> pointsForSection,
+            Stack<LineParam> temp) {
+        while (!temp.isEmpty()) {
+            LineParam entry = temp.pop();
+
+            int section = entry.getSection();
+            if (pointsForSection.get(section) == null) {
+                pointsForSection.put(section, new LinkedList<Point2D>());
+            }
+            pointsForSection.get(section).add(entry.getPoint());
+        }
+    }
+
+    public static void addAll(Map<Integer, List<Point2D>> pointsForSection,
+            List<LineParam> temp) {
+        while (!temp.isEmpty()) {
+            LineParam entry = temp.remove(0);
+
+            int section = entry.getSection();
+            if (pointsForSection.get(section) == null) {
+                pointsForSection.put(section, new LinkedList<Point2D>());
+            }
+            pointsForSection.get(section).add(entry.getPoint());
+        }
     }
 }

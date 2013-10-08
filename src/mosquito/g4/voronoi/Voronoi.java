@@ -25,7 +25,7 @@ import mosquito.g4.utils.Utils;
 // of points behind the obstacle, then these points get a section id of '-1'
 
 public class Voronoi {
-    private static final double MIN_DISTANCE = 10;
+    private static final double MIN_DISTANCE = .5;
     private Sections sections;
     private List<Section> sectionsAsList;
 
@@ -39,7 +39,8 @@ public class Voronoi {
 
     int[][] sectionIdBoard;
     double[][] scoreBoard;
-    private boolean debug;
+    boolean debug;
+    private PointToSectionConverter converter;
 
     public Voronoi(int minSections, int boardSize, Collection<Line2D> walls) {
         this.minSections = minSections;
@@ -67,6 +68,7 @@ public class Voronoi {
         setupBoards();
         calculateDistances();
         createSections();
+        // makeConvex();
         printSectionBoard();
     }
 
@@ -145,7 +147,8 @@ public class Voronoi {
     }
 
     private void createSections() {
-        this.sections = new Sections();
+        this.converter = new PointToSectionConverter(sectionIdBoard);
+        this.sections = new Sections(this.converter);
         sectionsAsList = new ArrayList<Section>(getNumSections());
 
         // populate sections array
@@ -168,9 +171,6 @@ public class Voronoi {
         while (getNumSections() < minSections) {
             splitSection();
         }
-
-        this.sections.setSectionBoard(sectionIdBoard);
-
     }
 
     public void putPointInSection(int i, int j) {
@@ -202,7 +202,28 @@ public class Voronoi {
         setNumSections(getNumSections() + 1);
     }
 
-    public Iterable<Point2D> getVoronoiPoints() {
+    private void makeConvex() {
+        for (int x = 1; x < sectionIdBoard.length; x++) {
+            for (int y = 0; y < sectionIdBoard[0].length; y++) {
+                int newX = x + 2;
+                int newY = y - 1;
+                int section = sectionIdBoard[x][y];
+
+                if (Utils.withinBounds(0, sectionIdBoard.length, newX)
+                        && Utils.withinBounds(0, sectionIdBoard[0].length, newY)) {
+                    if (sectionIdBoard[newX][newY] == section) {
+                        sectionIdBoard[x + 1][y] = section;
+                    }
+                }
+            }
+        }
+    }
+
+    public int[][] getSectionIdBoard() {
+        return this.sectionIdBoard;
+    }
+
+    public Collection<Point2D> getVoronoiPoints() {
         return voronoiPoints;
     }
 
@@ -228,7 +249,7 @@ public class Voronoi {
 
     public static void main(String[] args) {
         Set<Line2D> walls = new HashSet<Line2D>();
-        // walls.add(new Line2D.Double(50.1, 0, 49.9, 98.9));
+        walls.add(new Line2D.Double(5, 0, 49.9, 98.9));
         Voronoi v = new Voronoi(2, 100, walls);
         v.debug = true;
         v.doVoronoi();

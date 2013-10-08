@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import mosquito.g4.utils.Utils;
+import mosquito.g4.voronoi.SectionLineDrawer;
 import mosquito.g4.voronoi.Voronoi;
 import mosquito.sim.Collector;
 import mosquito.sim.Light;
@@ -49,13 +49,14 @@ public class VoronoiPlayer extends Player {
         this.v = new Voronoi(numLights, 100, walls);
         v.doVoronoi();
 
-        ArrayList<Line2D> list = new ArrayList<Line2D>();
+        //
+        // ArrayList<Line2D> list = new ArrayList<Line2D>();
+        //
+        // for (Line2D wall : walls) {
+        // list.add(Utils.getPerpendicularLine(wall, 10));
+        // }
 
-        for (Line2D wall : walls) {
-            list.add(Utils.getPerpendicularLine(wall, 10));
-        }
-
-        return list;
+        return new SectionLineDrawer(v.getSectionIdBoard()).createLines();
     }
 
     /*
