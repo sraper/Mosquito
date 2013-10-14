@@ -30,4 +30,8 @@ public class Sections {
     public int getSection(int x, int y) {
         return this.converter.getSection(x, y);
     }
+    
+    public int[][] getSectionBoard() {
+    	return converter.getSectionBoard();
+    }
 }

@@ -12,7 +12,11 @@ public class PointToSectionConverter {
 
     public int getSection(int x, int y) {
 
-        return Utils.withinBounds(0, 99, x) && Utils.withinBounds(0, 99, y) ? sectionBoard[x][y]
+        return Utils.withinBounds(0, 100, x) && Utils.withinBounds(0, 100, y) ? sectionBoard[x][y]
                 : -1;
+    }
+    
+    public int[][] getSectionBoard() {
+    	return sectionBoard;
     }
 }
