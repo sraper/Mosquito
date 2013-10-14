@@ -194,7 +194,7 @@ public class Voronoi {
         this.voronoiPoints = voronoiPoints;
     }
 
-    private int getNumSections() {
+    public int getNumSections() {
         return numSections;
     }
 
@@ -208,6 +208,10 @@ public class Voronoi {
                 && Utils.withinBounds(minDim, maxDim, point.getY())) {
             list.add(point);
         }
+    }
+    
+    public Sections getSections() {
+    	return sections;
     }
 
     public static void main(String[] args) {

@@ -31,6 +31,10 @@ public class Sections {
     public void setSectionBoard(int[][] sectionBoard) {
         this.sectionBoard = sectionBoard;
     }
+    
+    public int[][] getSectionBoard() {
+    	return sectionBoard;
+    }
 
     public int getSection(int x, int y) {
         return Utils.withinBounds(0, 99, x) && Utils.withinBounds(0, 99, y) ? sectionBoard[x][y]

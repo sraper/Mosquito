@@ -78,6 +78,21 @@ public class TestPlayer extends mosquito.sim.Player {
 			lights.add(l);
 		}
 		
+//		if(numLights > 3) {
+//			for (int i = 3; i < 6 || i == numLights - 1; i++) {
+//				if ((20 + i*60) % 100 < 20) {
+//					lastLight = new Point2D.Double((40 + i*60) % 100, 100);
+//				} else {
+//					lastLight = new Point2D.Double((20 + i*60) % 100, 100);
+//				}
+//				
+//				MoveableLight l = new MoveableLight(lastLight.getX(), lastLight.getY(), true);
+//				
+//				log.trace("Positioned a light at (" + lastLight.getX() + ", " + lastLight.getY() + ")");
+//				lights.add(l);
+//			}
+//		}
+		
 		return lights;
 	}
 	
@@ -96,7 +111,7 @@ public class TestPlayer extends mosquito.sim.Player {
 			MoveableLight ml = (MoveableLight)l;
 			
 //			if (!findMosquito(ml, board)){
-				if (ml.getY() < 100) {
+				if (ml.getY() < 99) {
 					ml.moveDown();
 				} else {
 					moveToCollector(ml);
@@ -113,8 +128,13 @@ public class TestPlayer extends mosquito.sim.Player {
 	 */
 	@Override
 	public Collector getCollector() {
-		Collector c = new Collector(50, 100);
-		mycollector = new Point2D.Double(50, 100);
+		Collector c;
+		if(numLights < 6) {
+			c = new Collector(50, 99);
+			mycollector = new Point2D.Double(50, 99);
+		} else {
+			c = new Collector(50, 50);
+		}
 		log.debug("Positioned a Collector at (" + c.getX() + ", " + c.getY() + ")");
 		return c;
 	}
