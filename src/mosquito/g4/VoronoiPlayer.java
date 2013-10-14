@@ -66,7 +66,7 @@ public class VoronoiPlayer extends Player {
         // }
 
         sections = v.getSections();
-        s = new Sweeper(v.getNumSections(), sections.getSectionBoard());
+        // s = new Sweeper(v.getNumSections(), sections.getSectionBoard());
         return new SectionLineDrawer(v.getSectionIdBoard()).createLines();
     }
 
@@ -77,15 +77,15 @@ public class VoronoiPlayer extends Player {
      */
     public Set<Light> getLights(int[][] board) {
 
-        for (int i = 0; i < v.getNumSections(); i++) {
-            lights.add(new MoveableLight(s.getStartingPoints().get(i).getX(), s
-                    .getStartingPoints().get(i).getY(), true));
-        }
-
-        while (lights.size() < numLights) {
-            // just for reference.
-            lights.add(new MoveableLight(27, 1, true));
-        }
+        // for (int i = 0; i < v.getNumSections(); i++) {
+        // lights.add(new MoveableLight(s.getStartingPoints().get(i).getX(), s
+        // .getStartingPoints().get(i).getY(), true));
+        // }
+        //
+        // while (lights.size() < numLights) {
+        // // just for reference.
+        // lights.add(new MoveableLight(27, 1, true));
+        // }
         return lights;
     }
 
