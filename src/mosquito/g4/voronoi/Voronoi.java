@@ -4,6 +4,8 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -68,7 +70,6 @@ public class Voronoi {
         setupBoards();
         calculateDistances();
         createSections();
-        // makeConvex();
         System.err.println("Created " + getNumSections() + " sections");
         printSectionBoard();
     }
@@ -86,7 +87,41 @@ public class Voronoi {
             Voronoi.conditionallyAddPoint(list, p1, 0, boardSize);
             Voronoi.conditionallyAddPoint(list, p2, 0, boardSize);
         }
+
+        removeUnneededPoints(list);
         setVoronoiPoints(list);
+    }
+
+    public void removeUnneededPoints(LinkedList<Point2D> list) {
+        Collections.sort(list, new Comparator<Point2D>() {
+
+            @Override
+            public int compare(Point2D o1, Point2D o2) {
+                return o1.getX() > o2.getX() ? 1 : -1;
+            }
+        });
+
+        for (int i = 0; i < list.size(); i++) {
+            Point2D p1 = list.get(i);
+            for (int j = i + 1; j < list.size(); j++) {
+                Point2D p2 = list.get(j);
+
+                Line2D line = new Line2D.Double(p1, p2);
+
+                boolean intersects = false;
+                for (Line2D wall : walls) {
+                    if (line.intersectsLine(wall)) {
+                        intersects = true;
+                        break;
+                    }
+                }
+
+                if (!intersects) {
+                    list.remove(j);
+                    j--;
+                }
+            }
+        }
     }
 
     private void setupBoards() {
@@ -171,6 +206,36 @@ public class Voronoi {
 
         while (getNumSections() < minSections) {
             splitSection();
+        }
+
+        // assignMissedElements();
+    }
+
+    private void assignMissedElements() {
+
+        assignMissedElement(0, 0);
+
+        for (int i = 1; i < boardSize; i++) {
+            assignMissedElement(i, 0);
+            assignMissedElement(0, i);
+        }
+    }
+
+    private void assignMissedElement(int i, int j) {
+        if (Utils.withinBounds(0, boardSize, i)
+                && Utils.withinBounds(0, boardSize, j)) {
+            assignMissedElement(i + 1, j + 1);
+
+            if (this.sectionIdBoard[i][j] == -1) {
+                if (Utils.withinBounds(0, boardSize, i + 1)
+                        && Utils.withinBounds(0, boardSize, j + 1)) {
+                    this.sectionIdBoard[i][j] = this.sectionIdBoard[i + 1][j + 1];
+                } else if (Utils.withinBounds(0, boardSize, i - 1)
+                        && Utils.withinBounds(0, boardSize, j - 1)) {
+                    this.sectionIdBoard[i][j] = this.sectionIdBoard[i - 1][j - 1];
+
+                }
+            }
         }
     }
 
