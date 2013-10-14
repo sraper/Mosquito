@@ -39,7 +39,7 @@ public class Voronoi {
 
     int[][] sectionIdBoard;
     double[][] scoreBoard;
-    boolean debug;
+    boolean debug = true;
     private PointToSectionConverter converter;
 
     public Voronoi(int minSections, int boardSize, Collection<Line2D> walls) {
@@ -69,6 +69,7 @@ public class Voronoi {
         calculateDistances();
         createSections();
         // makeConvex();
+        System.err.println("Created " + getNumSections() + " sections");
         printSectionBoard();
     }
 

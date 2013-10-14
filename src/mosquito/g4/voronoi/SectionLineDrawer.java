@@ -76,12 +76,8 @@ public class SectionLineDrawer {
         ArrayList<Line2D> lines = new ArrayList<Line2D>(perimeterPoints.size());
         Point2D prev = null;
         Point2D current = null;
-        Point2D head = null;
 
         for (Point2D point : perimeterPoints) {
-            if (head == null) {
-                head = point;
-            }
             if (prev == null) {
                 prev = point;
             } else {
@@ -109,6 +105,5 @@ public class SectionLineDrawer {
 
         SectionLineDrawer drawer = new SectionLineDrawer(v.getSectionIdBoard());
         System.out.println(drawer.createLines());
-
     }
 }

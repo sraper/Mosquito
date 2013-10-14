@@ -59,7 +59,8 @@ public class Utils {
     public static void print(PrintStream stream, int[][] array) {
         for (int i = 0; i < array.length; i++) {
             for (int j = 0; j < array[0].length; j++) {
-                stream.print(String.format("%d ", array[j][i]));
+                int val = array[j][i];
+                stream.print(String.format(val < 10 ? "0%d " : "%d ", val));
             }
             stream.println();
         }

@@ -1,14 +1,11 @@
 package mosquito.g4;
 
 import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import mosquito.g4.utils.Utils;
-import mosquito.g4.voronoi.Section;
 import mosquito.g4.voronoi.SectionLineDrawer;
 import mosquito.g4.voronoi.Sections;
 import mosquito.g4.voronoi.Voronoi;
@@ -29,7 +26,7 @@ public class VoronoiPlayer extends Player {
     private Voronoi v;
     private Sweeper s;
     private Sections sections;
-    
+
     private boolean[] issweeping;
 
     public VoronoiPlayer() {
@@ -58,15 +55,15 @@ public class VoronoiPlayer extends Player {
         this.v = new Voronoi(numLights, 100, walls);
         v.doVoronoi();
 
-        if(numLights == v.getNumSections()) {
-        	Arrays.fill(issweeping, true);
+        if (numLights == v.getNumSections()) {
+            Arrays.fill(issweeping, true);
         }
-        
-//        ArrayList<Line2D> list = new ArrayList<Line2D>();
-//
-//        for (Line2D wall : walls) {
-//            list.add(Utils.getPerpendicularLine(wall, 10));
-//        }
+
+        // ArrayList<Line2D> list = new ArrayList<Line2D>();
+        //
+        // for (Line2D wall : walls) {
+        // list.add(Utils.getPerpendicularLine(wall, 10));
+        // }
 
         sections = v.getSections();
         s = new Sweeper(v.getNumSections(), sections.getSectionBoard());
@@ -80,12 +77,13 @@ public class VoronoiPlayer extends Player {
      */
     public Set<Light> getLights(int[][] board) {
 
-    	for (int i = 0; i < v.getNumSections(); i++) {
-    		lights.add(new MoveableLight(s.getStartingPoints().get(i).getX(), s.getStartingPoints().get(i).getY() , true));
-    	}
+        for (int i = 0; i < v.getNumSections(); i++) {
+            lights.add(new MoveableLight(s.getStartingPoints().get(i).getX(), s
+                    .getStartingPoints().get(i).getY(), true));
+        }
 
         while (lights.size() < numLights) {
-        	// just for reference.
+            // just for reference.
             lights.add(new MoveableLight(27, 1, true));
         }
         return lights;
@@ -99,11 +97,11 @@ public class VoronoiPlayer extends Player {
      * you the number of mosquitoes at coordinate (x, y)
      */
     public Set<Light> updateLights(int[][] board) {
-    	for(Light l : lights) {
-    		MoveableLight ml = (MoveableLight) l;
-    		s.doSweep(ml, sections.getSection((int)ml.getX(), (int) ml.getY()));
-    	}
-    	return lights;
+        for (Light l : lights) {
+            MoveableLight ml = (MoveableLight) l;
+            s.doSweep(ml, sections.getSection((int) ml.getX(), (int) ml.getY()));
+        }
+        return lights;
     }
 
     /*
