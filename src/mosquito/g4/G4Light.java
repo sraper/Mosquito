@@ -1,6 +1,8 @@
 package mosquito.g4;
 
+import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
+import java.util.ArrayList;
 
 import mosquito.sim.MoveableLight;
 
@@ -10,9 +12,13 @@ public class G4Light extends MoveableLight {
     private static final double DELTA = 1;
 
     private static Logger log = Logger.getLogger(G4Light.class);
+    
+    private ArrayList<Point2D.Double> path;
+    private int pathIndex = 0;
 
     // boolean isClosestToCollector;
     boolean reachedDestination;
+    boolean hasDestination;
     int id;
 
     NextDestination nextDest;
@@ -24,6 +30,38 @@ public class G4Light extends MoveableLight {
     private Double collectorLocation;
 
     private boolean stayPut;
+    
+    public void setPath(ArrayList<Point2D.Double> path){
+    	this.path = path;
+    	hasDestination = true;
+    	pathIndex = 0;
+    }
+    
+    public boolean destinationReached() {
+    	if (path != null) {
+    	double path_x = path.get(path.size()-1).x;
+    	double path_y = path.get(path.size()-1).y;
+    	boolean destReached = (this.getX() == path_x && this.getY() == path_y);
+    	if (destReached)
+    		hasDestination = false;
+    	return destReached;
+    	}
+    	return true;
+    }
+    
+    public Point2D.Double incrementPath(){
+    	if (pathIndex < path.size())
+    		return path.get(pathIndex++);
+    	else
+    		return path.get(path.size()-1);
+    }
+    
+    public Point2D.Double getNextPoint(){
+    	if (pathIndex < path.size())
+    		return path.get(pathIndex);
+    	else
+    		return path.get(path.size()-1);
+    }
 
     public G4Light(double x, double y, int id, LightQuadrantTracker tracker) {
         super(x, y, true);
@@ -31,6 +69,11 @@ public class G4Light extends MoveableLight {
         this.tracker = tracker;
         setDestination(x, y, NextDestination.Quadrant);
     }
+    
+    public G4Light(double x, double y) {
+        super(x, y, true);
+    }
+    
 
     public void setDestination(double x, double y, NextDestination dest) {
         // log.debug("Set dest called with " + x + " " + y + " " + dest);

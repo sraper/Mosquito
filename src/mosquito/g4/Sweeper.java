@@ -1,11 +1,9 @@
 package mosquito.g4;
 
 import java.awt.Point;
-import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Point2D.Double;
 import java.util.ArrayList;
-
-import mosquito.sim.MoveableLight;
 
 import org.apache.log4j.Logger;
 
@@ -25,11 +23,13 @@ public class Sweeper {
 	private boolean[] donephaseone; // to signal that we've arrived at the starting point
 	private ArrayList<Point2D> leftmostpoint;
 	private ArrayList<Point2D> rightmostpoint;
+	private AStar star;
 	
-	public Sweeper(int numsections, int[][] board) {
+	public Sweeper(AStar star, int numsections, int[][] board) {
 		counter = new int[numsections];
 		lasttimeup = new boolean[numsections];
 		donesweep = new boolean[numsections];
+		this.star = star;
 		this.board = board;
 		this.numsections = numsections;
 		donephaseone = new boolean[numsections];
@@ -38,21 +38,33 @@ public class Sweeper {
 	}
 	
 	// should enumerate but lazy
-	public boolean doSweep(MoveableLight ml, int section) {
+	public boolean doSweep(G4Light ml, int section) {
 		//move to start point
 		if (!donephaseone[section]) {
 			donephaseone[section] = moveToPoint(ml, leftmostpoint.get(section).getX(), leftmostpoint.get(section).getY());
 			return true;
 		}
 		
+		if (!ml.destinationReached() && ml.hasDestination){
+			Point2D.Double np = ml.getNextPoint();
+			Point2D mlPoint = new Point2D.Double(ml.getX(), ml.getY());
+			
+			log.trace(np.distance(mlPoint));
+			log.trace("currently at:" + ml.getX() + ", " + ml.getY());
+			log.trace("moving to:" + np.x + ", " + np.y);
+			boolean reached = moveToPoint(ml, np.x, np.y);
+			if (reached && ml.getX() == np.x && ml.getY() == np.y)
+				ml.incrementPath();
+		}
 		
     	int mymove = justGo(section, (int)ml.getX(), (int)ml.getY());
     	switch (mymove){
     		case -2:
     			// done
     			// just go left when done for now for easy visualization
-    			log.trace("i'm done");
-    			ml.moveLeft();
+    			ArrayList<Point2D.Double> starPath = star.getPath(new Point2D.Double(ml.getX(), ml.getY()), new Point2D.Double(50,50));
+    			ml.setPath(starPath);
+    //			ml.moveLeft();
     			return false;
     		case -1:
     			//not imp: gen error handling whatever
@@ -90,6 +102,7 @@ public class Sweeper {
 		if (move == -1 && donesweep[section]) {
 			log.trace("breaking out");
 			donesweep[section] = false;
+			
 			return -2;
 		// sweeping in upward or downward direction
 		} else if (counter[section] % 12 == 0 && move != -1) {
@@ -103,7 +116,6 @@ public class Sweeper {
 			} else if(x + 2 < 100 && board[x + 2][y] != section) {
 				move = goUpDown(section, x, y, true);
 				if (move == -1) {
-					log.trace("dis mu fucka");
 					lasttimeup[section] = !lasttimeup[section];
 					return -1;
 				}
@@ -176,9 +188,6 @@ public class Sweeper {
 	        }
         }
         
-//        for (int i = 0; i < 2; i ++) {
-//        	log.trace("section " + i + "leftmost point; x: " + leftmostpoint.get(i).getX() + ", y: " + leftmostpoint.get(i).getY());
-//        }
 	}
 	
 	// find our end point
@@ -193,18 +202,16 @@ public class Sweeper {
         	}
         }
         
-//        for (int i = 0; i < 2; i ++) {
-//        	log.trace("section " + i + "rightmost point; x: " + rightmostpoint.get(i).getX() + ", y: " + rightmostpoint.get(i).getY());
-//        }
 	}
 	
-	private boolean moveToPoint(MoveableLight inlight, double x, double y) {		
+	private boolean moveToPoint(G4Light inlight, double x, double y) {	
+		log.trace(inlight.getX() + " " + inlight.getY() + " " + x + " " + y);
 		double difx = x - inlight.getX();
 		double dify = y - inlight.getY();
 		double delx = difx / (Math.abs(difx) + Math.abs(dify));
 		double dely = dify / (Math.abs(difx )+ Math.abs(dify));
 		
-		if(Math.abs(difx) + Math.abs(dify) <= 1) {
+		if(Math.abs(difx) + Math.abs(dify) < 1) {
 			inlight.moveTo(x, y);
 			return true;
 		} else {
@@ -212,6 +219,8 @@ public class Sweeper {
 			return false;
 		}
 	}
+	
+	
 	
 	public ArrayList<Point2D> getStartingPoints(){
 		return leftmostpoint;
