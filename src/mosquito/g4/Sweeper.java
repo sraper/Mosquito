@@ -198,7 +198,7 @@ public class Sweeper {
 //        }
 	}
 	
-	private boolean moveToPoint(MoveableLight inlight, double x, double y) {		
+	public boolean moveToPoint(MoveableLight inlight, double x, double y) {		
 		double difx = x - inlight.getX();
 		double dify = y - inlight.getY();
 		double delx = difx / (Math.abs(difx) + Math.abs(dify));

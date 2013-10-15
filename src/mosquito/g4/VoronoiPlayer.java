@@ -51,10 +51,10 @@ public class VoronoiPlayer extends Player {
     @Override
     public ArrayList<Line2D> startNewGame(Set<Line2D> walls, int numLights) {
         this.numLights = numLights;
-        issweeping = new boolean[numLights];
         this.v = new Voronoi(numLights, 100, walls);
         v.doVoronoi();
 
+        issweeping = new boolean[v.getNumSections()];
         if (numLights == v.getNumSections()) {
             Arrays.fill(issweeping, true);
         }
@@ -66,7 +66,7 @@ public class VoronoiPlayer extends Player {
         // }
 
         sections = v.getSections();
-        // s = new Sweeper(v.getNumSections(), sections.getSectionBoard());
+         s = new Sweeper(v.getNumSections(), sections.getSectionBoard());
         return new SectionLineDrawer(v.getSectionIdBoard()).createLines();
     }
 
@@ -77,15 +77,14 @@ public class VoronoiPlayer extends Player {
      */
     public Set<Light> getLights(int[][] board) {
 
-        // for (int i = 0; i < v.getNumSections(); i++) {
-        // lights.add(new MoveableLight(s.getStartingPoints().get(i).getX(), s
-        // .getStartingPoints().get(i).getY(), true));
-        // }
-        //
-        // while (lights.size() < numLights) {
-        // // just for reference.
-        // lights.add(new MoveableLight(27, 1, true));
-        // }
+         for (int i = 0; i < numLights; i++) {
+        	 lights.add(new MoveableLight(s.getStartingPoints().get(i).getX(), s.getStartingPoints().get(i).getY(), true));
+         }
+        
+         while (lights.size() < numLights) {
+         // just for reference.
+         lights.add(new MoveableLight(27, 1, true));
+         }
         return lights;
     }
 
@@ -99,7 +98,12 @@ public class VoronoiPlayer extends Player {
     public Set<Light> updateLights(int[][] board) {
         for (Light l : lights) {
             MoveableLight ml = (MoveableLight) l;
-            s.doSweep(ml, sections.getSection((int) ml.getX(), (int) ml.getY()));
+            int currentsection = sections.getSection((int) ml.getX(), (int) ml.getY());
+            if (issweeping[currentsection]) {
+            	issweeping[currentsection] = s.doSweep(ml, currentsection);
+            } else {
+            	s.moveToPoint(ml, 50, 50);
+            }
         }
         return lights;
     }
