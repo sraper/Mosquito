@@ -101,4 +101,37 @@ public class Utils {
             pointsForSection.get(section).add(entry.getPoint());
         }
     }
+
+    public static Point2D getNextStep(double x1, double y1, double x2, double y2) {
+        return getNextStep(new Point2D.Double(x1, y1), new Point2D.Double(x2,
+                y2));
+    }
+
+    public static Point2D getNextStep(Point2D src, Point2D dest) {
+        double distance = src.distance(dest);
+        if (distance <= 1) {
+            return dest;
+        } else {
+            double dx = dest.getX() - src.getX();
+            double dy = dest.getY() - src.getY();
+
+            double stepX = (dx / distance);
+            double stepY = (dy / distance);
+
+            Point2D.Double result = new Point2D.Double(src.getX() + stepX,
+                    src.getY() + stepY);
+
+            System.out.println(result.distance(src));
+            return result;
+        }
+    }
+
+    public static void main(String[] args) {
+        // System.out.println(getNextStep(0, 0, 1, 0));
+        // System.out.println(getNextStep(0, 0, -1, 0));
+        // System.out.println(getNextStep(0, 0, 1, 1));
+        System.out.println(getNextStep(88, 62, 88, 60));
+        // TODO: doesn't work
+        System.out.println(getNextStep(1, 1, -1, -1));
+    }
 }
