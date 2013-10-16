@@ -52,10 +52,11 @@ public class Voronoi {
 
     public void setupWalls(Collection<Line2D> walls) {
         this.walls = walls;
+        
 
-        if (walls.isEmpty()) {
-            createDefaultWall();
-        }
+//        if (walls.isEmpty()) {
+//            createDefaultWall();
+//        }
     }
 
     public void createDefaultWall() {
@@ -86,6 +87,10 @@ public class Voronoi {
 
             Voronoi.conditionallyAddPoint(list, p1, 0, boardSize);
             Voronoi.conditionallyAddPoint(list, p2, 0, boardSize);
+        }
+        
+        if (list.isEmpty()) {
+        	list.add(new Point2D.Double(0,0));
         }
 
         removeUnneededPoints(list);
@@ -130,7 +135,7 @@ public class Voronoi {
 
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
-                sectionIdBoard[i][j] = -1;
+                sectionIdBoard[i][j] = 0;
                 scoreBoard[i][j] = Double.MAX_VALUE;
             }
         }

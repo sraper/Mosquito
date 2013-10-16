@@ -74,7 +74,7 @@ public class VoronoiPlayer extends Player {
      */
     public Set<Light> getLights(int[][] board) {
 
-        for (int i = 0; i < v.getNumSections(); i++) {
+        for (int i = 0; i < v.getNumSections() && lights.size() < numLights; i++) {
             lights.add(new G4Light(s.getStartingPoints().get(i).getX(), s
                     .getStartingPoints().get(i).getY()));
         }

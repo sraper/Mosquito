@@ -8,12 +8,17 @@ import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Set;
 
+import mosquito.g4.utils.Utils;
+
 public class AStar {
 
 
 	private int[][] wallMap;
+	private Set<Line2D> walls;
 
 	public AStar(Set<Line2D> walls){
+		this.walls = walls; 
+		/*
 		wallMap = new int[100][100];
 		if (walls.isEmpty()){
 			for (int i=0; i< 100; i++){
@@ -26,14 +31,18 @@ public class AStar {
 			for (Line2D wall : walls){
 				for (int i=0; i< 100; i++){
 					for (int j=0;j< 100; j++){
-						if (wall.contains(new Point2D.Double(i,j)))
-							wallMap[i][j] = Integer.MAX_VALUE;
-						else
+						if (wall.contains(new Point2D.Double(i,j))){
+							wallMap[i][j] = 40000;
+						}
+						else if (wallMap[i][j] != Integer.MAX_VALUE && wallMap[i][j] != 1)
 							wallMap[i][j] = 1;
 					}
 				}
 			}
-		}
+		} 
+		System.err.println("PRINTING OUT WALLMAP");
+		Utils.print(System.err, wallMap);
+		System.err.println("PRINTING OUT AFTER WALLMAP"); */
 	}
 
 	private ArrayList<Point> getNeighbors(Point2D.Double point){
@@ -81,25 +90,7 @@ public class AStar {
 		}
 
 	}
-	/*
-	public void star(){
-		HashSet<Point> closed = new HashSet<Point>();
-		PriorityQueue<> queue = new PriorityQueue<double, Path<Node>>();
-		queue.Enqueue(0, new Path<Node>(start));
-		while (!queue.IsEmpty)
-		{
-		    var path = queue.Dequeue();
-		    if (closed.Contains(path.LastStep)) continue;
-		    if (path.LastStep.Equals(destination)) return path;
-		    closed.Add(path.LastStep);
-		    foreach(Node n in path.LastStep.Neighbours)
-		    {
-		        double d = distance(path.LastStep, n);
-		        var newPath = path.AddStep(n, d);
-		        queue.Enqueue(newPath.TotalCost + estimate(n), newPath);
-		    }
-		}
-	} */
+
 	
 	public ArrayList<Point2D.Double> getPath(Point2D.Double start, Point2D.Double end){
 		HashSet<Point2D.Double> closedSet = new HashSet<Point2D.Double>(); 
@@ -119,7 +110,22 @@ public class AStar {
 			closedSet.add(current);
 			ArrayList<Point> neighbors = getNeighbors(current);
 			for (Point neighbor : neighbors){
-				int neighbor_cost = current.score + wallMap[(int)neighbor.x][(int)neighbor.y];
+				int score = 1;
+				if (!Utils.hasStraightPath(current, neighbor, walls))
+					score += 50000;
+				for (Point nb2 : getNeighbors(neighbor)){
+					if (!Utils.hasStraightPath(neighbor, nb2, walls))
+						score += 5000;
+					for (Point nb3 : getNeighbors(nb2)){
+						if (!Utils.hasStraightPath(nb2, nb3, walls))
+							score += 500;
+						for (Point nb4 : getNeighbors(nb3)){
+							if (!Utils.hasStraightPath(nb3, nb4, walls))
+								score += 50;
+						}
+					}
+				}
+				int neighbor_cost = current.score + score;
 				if (closedSet.contains(neighbor))
 					continue;
 				if (!openSet.contains(neighbor) || neighbor_cost < neighbor.score) {

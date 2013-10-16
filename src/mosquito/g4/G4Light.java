@@ -57,8 +57,6 @@ public class G4Light extends MoveableLight {
     	double path_x = path.get(path.size()-1).x;
     	double path_y = path.get(path.size()-1).y;
     	boolean destReached = (this.getX() == path_x && this.getY() == path_y);
-    	if (destReached)
-    		hasDestination = false;
     	return destReached;
     	}
     	return true;
