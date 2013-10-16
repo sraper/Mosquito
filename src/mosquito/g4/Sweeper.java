@@ -2,7 +2,6 @@ package mosquito.g4;
 
 import java.awt.Point;
 import java.awt.geom.Point2D;
-import java.awt.geom.Point2D.Double;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
@@ -12,7 +11,7 @@ public class Sweeper {
 	private static final int CONFIDENCE_AREA = 12;
 	
 	
-    private static final Logger log = Logger.getLogger(G4Player.class); // for
+    private static final Logger log = Logger.getLogger(VoronoiPlayer.class); // for
                                                                         // logging
 	private int[] counter; // for counting steps right
 	private boolean[] lasttimeup; // for continuing in same dir
@@ -52,8 +51,7 @@ public class Sweeper {
 			log.trace(np.distance(mlPoint));
 			log.trace("currently at:" + ml.getX() + ", " + ml.getY());
 			log.trace("moving to:" + np.x + ", " + np.y);
-			boolean reached = moveToPoint(ml, np.x, np.y);
-			if (reached && ml.getX() == np.x && ml.getY() == np.y)
+			if (moveToPoint(ml, np.x, np.y))
 				ml.incrementPath();
 		}
 		
@@ -63,7 +61,9 @@ public class Sweeper {
     			// done
     			// just go left when done for now for easy visualization
     			ArrayList<Point2D.Double> starPath = star.getPath(new Point2D.Double(ml.getX(), ml.getY()), new Point2D.Double(50,50));
+    			log.trace("GOT THE PATH");
     			ml.setPath(starPath);
+    			ml.printPath();
     //			ml.moveLeft();
     			return false;
     		case -1:
@@ -90,7 +90,7 @@ public class Sweeper {
 		
 		// if we see the end
 		if (x + CONFIDENCE_AREA > rightmostpoint.get(section).getX()) {
-			log.trace("found end condition");
+		//	log.trace("found end condition");
 			counter[section] = 0;
 			// "done" in the sense that we still have to go up or down one last time
 			donesweep[section] = true;
@@ -100,7 +100,7 @@ public class Sweeper {
 		int move = goUpDown(section, x, y, false);
 		// done our final sweep, officially done the sweep
 		if (move == -1 && donesweep[section]) {
-			log.trace("breaking out");
+	//		log.trace("breaking out");
 			donesweep[section] = false;
 			
 			return -2;
@@ -136,7 +136,7 @@ public class Sweeper {
 		// if we were going up last time try to keep going that way
 		if (lasttimeup[section]) {
 			if (y - padding > 0 && board[x][y - padding] == section) {
-				log.trace("going up, x: " + x + ", y: " + y + ", section: " + section);
+	//			log.trace("going up, x: " + x + ", y: " + y + ", section: " + section);
 				return 1; //north
 			// reached a perimeter, signal that we need to start heading right now
 			} else {
@@ -145,7 +145,7 @@ public class Sweeper {
 			}
 		} else {
 			if (y + padding < 100 && board[x][y + padding] == section) {
-				log.trace("going down, x: " + x + ", y: " + y + ", section: " + section);
+	//			log.trace("going down, x: " + x + ", y: " + y + ", section: " + section);
 				return 3; // south
 			} else {
 				lasttimeup[section] = true;
@@ -204,14 +204,13 @@ public class Sweeper {
         
 	}
 	
-	private boolean moveToPoint(G4Light inlight, double x, double y) {	
-		log.trace(inlight.getX() + " " + inlight.getY() + " " + x + " " + y);
+	public boolean moveToPoint(G4Light inlight, double x, double y) {	
 		double difx = x - inlight.getX();
 		double dify = y - inlight.getY();
 		double delx = difx / (Math.abs(difx) + Math.abs(dify));
 		double dely = dify / (Math.abs(difx )+ Math.abs(dify));
 		
-		if(Math.abs(difx) + Math.abs(dify) < 1) {
+		if(Math.abs(difx) + Math.abs(dify) <= 1) {
 			inlight.moveTo(x, y);
 			return true;
 		} else {

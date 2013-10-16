@@ -168,57 +168,6 @@ public final class Board {
     public int cacheMisses = 0;
 
     public double getDirectionOfLight(Point2D p) {
-        // if (lightsChanged())
-        // clearCache();
-        // int angle = -1;
-        // double brightest = 0;
-        // // It's possible that there's a route to the light, we should check!
-        // for (double a = 0; a < Math.PI / 2; a += Math.PI / 120) {
-        // double r = 1;
-        // double cos = Math.cos(a);
-        // double sin = Math.sin(a);
-        // // cutoff for rounding issues
-        // if (cos < 0.00000000001)
-        // cos = 0;
-        // if (sin < 0.00000000001)
-        // sin = 0;
-        // if (cos != 0 && sin != 0) {
-        //
-        // double i = (double) (p.getX() + (r * cos));
-        // double j = (double) (p.getY() - (r * sin));
-        // double sample = lightStrengthAt(i, j,p);
-        // if (sample > brightest) {
-        // angle = (int) (a * 180 / Math.PI);
-        // brightest = sample;
-        // }
-        //
-        // i = (p.getX() - (r * cos));
-        // j = (p.getY() - (r * sin));
-        // sample = lightStrengthAt(i, j,p);
-        // if (sample > brightest) {
-        // angle = 180 - (int) (a * 180 / Math.PI);
-        // brightest = sample;
-        // }
-        //
-        // // 180+theta
-        // i = (p.getX() - (r * cos));
-        // j = (p.getY() + (r * sin));
-        // sample = lightStrengthAt(i, j,p);
-        // if (sample > brightest) {
-        // angle = 180 + (int) (a * 180 / Math.PI);
-        // brightest = sample;
-        // }
-        //
-        // // 360-theta
-        // i = (p.getX() + (r * cos));
-        // j = (p.getY() + (r * sin));
-        // sample = lightStrengthAt(i, j,p);
-        // if (sample > brightest) {
-        // angle = 360 - (int) (a * 180 / Math.PI);
-        // brightest = sample;
-        // }
-        // }
-        // }
         double angle = -1;
         double max_dist = 21;
         for (Light l : lights) {

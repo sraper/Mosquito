@@ -31,9 +31,24 @@ public class G4Light extends MoveableLight {
 
     private boolean stayPut;
     
+    public void printPath(){
+    	log.trace("Starts at : ");
+    	log.trace("x : " + this.getX() + " y : " + this.getY());
+    	double prevx = this.getX();
+    	double prevy = this.getY();
+    	for (Point2D.Double p : path){
+    		if (Math.sqrt(Math.pow(p.x-prevx, 2) + Math.pow(p.y-prevy,2)) > 1.0)
+    			log.trace("WARNING, DISTANCE GREATER THAN 1");
+    		log.trace("x : " + p.x + " y : " + p.y);
+    		prevx = p.x;
+    		prevy = p.y;
+    	}
+    }
+    
     public void setPath(ArrayList<Point2D.Double> path){
     	this.path = path;
     	hasDestination = true;
+    	reachedDestination = false;
     	pathIndex = 0;
     }
     

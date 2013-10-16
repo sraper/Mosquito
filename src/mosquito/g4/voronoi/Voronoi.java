@@ -208,7 +208,7 @@ public class Voronoi {
             splitSection();
         }
 
-        // assignMissedElements();
+        assignMissedElements();
     }
 
     private void assignMissedElements() {
@@ -312,9 +312,9 @@ public class Voronoi {
             list.add(point);
         }
     }
-    
+
     public Sections getSections() {
-    	return sections;
+        return sections;
     }
 
     public static void main(String[] args) {

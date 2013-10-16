@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
 
 public class VoronoiPlayer extends Player {
 
-    private static final Logger log = Logger.getLogger(G4Player.class); // for
+    private static final Logger log = Logger.getLogger(VoronoiPlayer.class); // for
                                                                         // logging
 
     private int numLights;
@@ -52,23 +52,18 @@ public class VoronoiPlayer extends Player {
     @Override
     public ArrayList<Line2D> startNewGame(Set<Line2D> walls, int numLights) {
         this.numLights = numLights;
-        issweeping = new boolean[numLights];
         this.v = new Voronoi(numLights, 100, walls);
         this.star = new AStar(walls);
         v.doVoronoi();
 
+        issweeping = new boolean[v.getNumSections()];
         if (numLights == v.getNumSections()) {
             Arrays.fill(issweeping, true);
         }
 
-        // ArrayList<Line2D> list = new ArrayList<Line2D>();
-        //
-        // for (Line2D wall : walls) {
-        // list.add(Utils.getPerpendicularLine(wall, 10));
-        // }
-
         sections = v.getSections();
         s = new Sweeper(star, v.getNumSections(), sections.getSectionBoard());
+
         return new SectionLineDrawer(v.getSectionIdBoard()).createLines();
     }
 
@@ -88,6 +83,7 @@ public class VoronoiPlayer extends Player {
             // just for reference.
             lights.add(new G4Light(27, 1));
         }
+
         return lights;
     }
 
@@ -102,6 +98,7 @@ public class VoronoiPlayer extends Player {
         for (Light l : lights) {
             G4Light ml = (G4Light) l;
             s.doSweep(ml, sections.getSection((int) ml.getX(), (int) ml.getY()));
+
         }
         return lights;
     }
