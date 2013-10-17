@@ -63,7 +63,7 @@ public	int id;
 	}
 
 	public boolean destinationReached() {
-		if (path != null) {
+		if (path != null && !path.isEmpty()) {
 			double path_x = path.get(path.size() - 1).x;
 			double path_y = path.get(path.size() - 1).y;
 			boolean destReached = (this.getX() == path_x && this.getY() == path_y);

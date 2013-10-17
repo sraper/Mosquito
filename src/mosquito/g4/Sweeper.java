@@ -47,21 +47,13 @@ public class Sweeper {
 		log.trace(Utils.toString(claimed));
 		if (claimed[section] == null) {
 			claimed[section] = ml;
-		}
-		if (ml.getX() == 50 && ml.getY() == 50) {
-			for (int i = 0; i < claimed.length; i++) {
-				if (claimed[i] == null) {
-					claimed[i] = ml;
-					section = i;
-
-					ml.setDispatched(true);
-					ml.dispatchedSection = i;
-					break;
-				}
+			if (ml.isDispatched()) {
+			log.trace("claiming " + section + " unclaiming " + ml.dispatchedSection);
+			claimed[ml.dispatchedSection] = null;
+			ml.dispatchedSection = section;
 			}
-
 		}
-
+		
 		if (ml.isDispatched())
 			section = ml.dispatchedSection;
 		// if (ml.waiting()) {
@@ -119,10 +111,14 @@ public class Sweeper {
 				// done
 				// just go left when done for now for easy visualization
 				ml.setDispatched(false);
-				ArrayList<Point2D.Double> starPath = star.getPath(
-						new Point2D.Double(ml.getX(), ml.getY()),
-						new Point2D.Double(50, 50));
-				ml.setPath(starPath);
+				section = findUnclaimedSection(ml);
+				if (section == -1) {
+					
+					ArrayList<Point2D.Double> starPath = star.getPath(
+							new Point2D.Double(ml.getX(), ml.getY()),
+							new Point2D.Double(50, 50));
+					ml.setPath(starPath);
+				}
 				// log.trace("Printing path:");
 				// ml.printPath();
 				return true;
@@ -142,6 +138,21 @@ public class Sweeper {
 				return false;
 			}
 		}
+	}
+
+	private int findUnclaimedSection(G4Light ml) {
+		int section = -1;
+		for (int i = 0; i < claimed.length; i++) {
+			if (claimed[i] == null) {
+				claimed[i] = ml;
+				section = i;
+
+				ml.setDispatched(true);
+				ml.dispatchedSection = i;
+				break;
+			}
+		}
+		return section;
 	}
 
 	public int justGo(int section, int x, int y) {
