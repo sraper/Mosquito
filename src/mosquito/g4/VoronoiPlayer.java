@@ -1,6 +1,7 @@
 package mosquito.g4;
 
 import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -11,7 +12,6 @@ import mosquito.g4.voronoi.Sections;
 import mosquito.g4.voronoi.Voronoi;
 import mosquito.sim.Collector;
 import mosquito.sim.Light;
-import mosquito.sim.MoveableLight;
 import mosquito.sim.Player;
 
 import org.apache.log4j.Logger;
@@ -76,12 +76,7 @@ public class VoronoiPlayer extends Player {
 
         for (int i = 0; i < v.getNumSections() && lights.size() < numLights; i++) {
             lights.add(new G4Light(s.getStartingPoints().get(i).getX(), s
-                    .getStartingPoints().get(i).getY()));
-        }
-
-        while (lights.size() < numLights) {
-            // just for reference.
-            lights.add(new G4Light(27, 1));
+                    .getStartingPoints().get(i).getY(), i));
         }
 
         return lights;
@@ -95,14 +90,43 @@ public class VoronoiPlayer extends Player {
      * you the number of mosquitoes at coordinate (x, y)
      */
     public Set<Light> updateLights(int[][] board) {
+    	boolean isAtCollector = false;
         for (Light l : lights) {
             G4Light ml = (G4Light) l;
-            s.doSweep(ml, sections.getSection((int) ml.getX(), (int) ml.getY()));
-
+//            if (!isAtCollector && ml.getLocation().equals(new Point2D.Double(50, 50))) {
+//            	isAtCollector = true;
+//            	continue;
+//            }
+            
+            boolean sweeping = s.doSweep(ml, sections.getSection((int) ml.getX(), (int) ml.getY()), board);
+            if(!sweeping) {
+            	ml.moveLeft();
+            }
         }
         return lights;
     }
 
+    public int findNextSection(int[][] mosquitoboard) {
+    	int max = 0;
+    	int bestsec = -1;
+    	for(int i = 0; i < v.getNumSections(); i++) {
+    		int count = 0;
+    		for(int j = 0; j < 100; j++) {
+    			for(int k = 0; k < 100; k++) {
+    				if(sections.getSection(j, k) == i) {
+    					count += mosquitoboard[j][k];
+    				}
+    			}
+    		}
+    		if (count > max) {
+    			count = max;
+    			bestsec = i;
+    		}	
+    	}
+    	return bestsec;
+    }
+    
+    
     /*
      * Currently this is only called once (after getLights), so you cannot move
      * the Collector.
