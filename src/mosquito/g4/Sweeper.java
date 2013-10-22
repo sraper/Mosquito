@@ -45,6 +45,8 @@ public class Sweeper {
 	// should enumerate but lazy
 	public boolean doSweep(G4Light ml, int section, int[][] mosquitoboard) {
 		log.trace(Utils.toString(claimed));
+		boolean done = ml.hasDestination && ml.destinationReached();
+
 		if (claimed[section] == null) {
 			claimed[section] = ml;
 			if (ml.isDispatched()) {
@@ -53,7 +55,9 @@ public class Sweeper {
 			ml.dispatchedSection = section;
 			}
 		}
-		
+		if (done && !ml.isDispatched()) {
+			return ml.hunt();
+		}
 		if (ml.isDispatched())
 			section = ml.dispatchedSection;
 		// if (ml.waiting()) {

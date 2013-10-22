@@ -94,7 +94,7 @@ public class AStar {
 				for (Point nb2 : getNeighbors(neighbor)){
 					if (!Utils.hasStraightPath(neighbor, nb2, walls))
 						score += 20000;
-					for (Point nb3 : getNeighbors(nb2)){
+			/*		for (Point nb3 : getNeighbors(nb2)){
 						if (!Utils.hasStraightPath(nb2, nb3, walls))
 							score += 2000;
 					/*	for (Point nb4 : getNeighbors(nb3)){
@@ -102,7 +102,7 @@ public class AStar {
 								score += 200;
 							
 						} */
-					}
+					//} */
 				}
 				int neighbor_cost = current.score + score;
 				if (closedSet.contains(neighbor))

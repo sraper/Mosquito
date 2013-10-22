@@ -33,6 +33,8 @@ public	int id;
 	private double dest_x;
 	private double dest_y;
 
+	private int end_wait = 3;
+	
 	private Double collectorLocation;
 
 	private boolean stayPut;
@@ -60,6 +62,18 @@ public	int id;
 		hasDestination = true;
 		reachedDestination = false;
 		pathIndex = 0;
+	}
+	
+	public boolean hunt(){
+		if (end_wait > 0){
+			end_wait--;
+			return true;
+		}
+		else {
+			
+			
+		}
+		return true;
 	}
 
 	public boolean destinationReached() {
