@@ -23,6 +23,8 @@ public class Sweeper {
 									// check
 	private boolean[] donephaseone; // to signal that we've arrived at the
 									// starting point
+	
+	private boolean[] isondiagonal;
 
 	private G4Light[] claimed;
 	private ArrayList<Point2D> leftmostpoint;
@@ -33,6 +35,7 @@ public class Sweeper {
 		counter = new int[numsections];
 		lasttimeup = new boolean[numsections];
 		donesweep = new boolean[numsections];
+		isondiagonal = new boolean[numsections];
 		claimed = new G4Light[numsections];
 		this.star = star;
 		this.board = board;
@@ -46,7 +49,6 @@ public class Sweeper {
 	public boolean doSweep(G4Light ml, int section, int[][] mosquitoboard) {
 		log.trace(Utils.toString(claimed));
 		boolean done = ml.hasDestination && ml.destinationReached();
-
 		if (claimed[section] == null) {
 			claimed[section] = ml;
 			if (ml.isDispatched()) {
@@ -56,7 +58,7 @@ public class Sweeper {
 			}
 		}
 		if (done && !ml.isDispatched()) {
-			return ml.hunt();
+//			return ml.hunt();
 		}
 		if (ml.isDispatched())
 			section = ml.dispatchedSection;
@@ -160,6 +162,10 @@ public class Sweeper {
 	}
 
 	public int justGo(int section, int x, int y) {
+		
+		
+		
+		
 		if (section >= numsections) {
 			return -1;
 		}
@@ -182,14 +188,22 @@ public class Sweeper {
 			return -2;
 			// sweeping in upward or downward direction
 		} else if (counter[section] % 12 == 0 && move != -1) {
+			isondiagonal[section] = true;
 			return move;
 			// moving right
 		} else {
+			isondiagonal[section] = true;
 			// end of board gtfo, don't think it ever goes here anymore?
 			if (x + 2 == 100) {
 				return -1;
 				// on a diagonal
 			} else if (x + 2 < 100 && board[x + 2][y] != section) {
+				log.trace("lasttimeup[" + section + "]: " + lasttimeup[section]);
+				StringBuilder sb = new StringBuilder();
+				for (int i = 0; i < lasttimeup.length; i++) {
+					sb.append(lasttimeup[i] + ", ");
+				}
+				log.trace(sb);
 				move = goUpDown(section, x, y, true);
 				if (move == -1) {
 					lasttimeup[section] = !lasttimeup[section];
@@ -204,11 +218,11 @@ public class Sweeper {
 		}
 	}
 
-	private int goUpDown(int section, int x, int y, boolean isondiagonal) {
-		int padding = CONFIDENCE_AREA;
-		if (isondiagonal) {
-			padding = 2;
-		}
+	private int goUpDown(int section, int x, int y, boolean isondiag) {
+		int padding = isondiag ? 2 : 12;
+//		if (isondiagonal) {
+//			padding = 2;
+//		}
 		// if we were going up last time try to keep going that way
 		if (lasttimeup[section]) {
 			if (y - padding > 0 && board[x][y - padding] == section) {
@@ -218,7 +232,9 @@ public class Sweeper {
 				// reached a perimeter, signal that we need to start heading
 				// right now
 			} else {
-				lasttimeup[section] = false;
+				if (!isondiagonal[section]) {
+					lasttimeup[section] = false;
+				}
 				return -1;
 			}
 		} else {
@@ -227,7 +243,9 @@ public class Sweeper {
 				// + section);
 				return 3; // south
 			} else {
-				lasttimeup[section] = true;
+				if (!isondiagonal[section]) {
+					lasttimeup[section] = true;
+				}
 				return -1;
 			}
 		}
@@ -291,6 +309,11 @@ public class Sweeper {
 
 	}
 
+	private void abortEarly() {
+		
+	}
+	
+	
 	public boolean moveToPoint(G4Light inlight, double x, double y) {
 		log.trace(inlight.getX() + " " + inlight.getY() + " " + x + " " + y);
 		Point2D current = new Point2D.Double(inlight.getX(), inlight.getY());

@@ -103,6 +103,7 @@ public	int id;
 	public G4Light(double x, double y, int id) {
 		super(x, y, true);
 		this.id = id;
+		isDispatched = true;
 	}
 
 	public void setDestination(double x, double y) {

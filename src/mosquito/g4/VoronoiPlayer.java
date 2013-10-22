@@ -73,7 +73,13 @@ public class VoronoiPlayer extends Player {
      * board[x][y] tells you the number of mosquitoes at coordinate (x, y)
      */
     public Set<Light> getLights(int[][] board) {
-
+    	int del = v.getNumSections()/numLights;
+//    	for (int i = 0; i < numLights; i++) {
+//    		int startsec = i + 
+//    		lights.add(new G4Light(s.getStartingPoints().get(startsec)))
+//    	}
+//    	
+    	
         for (int i = 0; i < v.getNumSections() && lights.size() < numLights; i++) {
             lights.add(new G4Light(s.getStartingPoints().get(i).getX(), s
                     .getStartingPoints().get(i).getY(), i));
