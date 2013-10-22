@@ -74,7 +74,7 @@ public class VoronoiPlayer extends Player {
      * called after startNewGame. The board tells you where the mosquitoes are:
      * board[x][y] tells you the number of mosquitoes at coordinate (x, y)
      */
-    public Set<Light> getLights(int[][] board) {
+    public Set<Light> getLights(int[][] board) {    
     	int[][] secboard = sections.getSectionBoard();
     	HashSet<Integer> seen = new HashSet<Integer>();
     	for (int count = 0; count < 100; count++) {
@@ -111,19 +111,21 @@ public class VoronoiPlayer extends Player {
     			}
     		}
     	}
-    	int del = v.getNumSections()/numLights;
-//    	for (int i = 0; i < numLights; i++) {
-//    		int startsec = i + 
-//    		lights.add(new G4Light(s.getStartingPoints().get(startsec)))
-//    	}
-//    	
     	
-        for (int i = 0; i < v.getNumSections() && lights.size() < numLights; i++) {
-            lights.add(new G4Light(s.getStartingPoints().get(i).getX(), s
-                    .getStartingPoints().get(i).getY(), i));
-        }
+//    	
+//        for (int i = 0; i < v.getNumSections() && lights.size() < numLights; i++) {
+//            lights.add(new G4Light(s.getStartingPoints().get(i).getX(), s
+//                    .getStartingPoints().get(i).getY(), i));
+//        }
 
         return lights;
+    }
+    
+    private HashSet<Integer> addLight (int section, HashSet<Integer> seen, int count) {
+		lights.add(new G4Light(s.getStartingPoints().get(section).getX(), s
+	        .getStartingPoints().get(section).getY(), seen.size()));
+		seen.add(section);
+		return seen;
     }
 
     private HashSet<Integer> addLight(int section, HashSet<Integer> seen) {
