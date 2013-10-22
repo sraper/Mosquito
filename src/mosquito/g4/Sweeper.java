@@ -12,7 +12,6 @@ public class Sweeper {
 
 	private static final int CONFIDENCE_AREA = 12;
 
-
 	private static final Logger log = Logger.getLogger(VoronoiPlayer.class); // for
 	// logging
 	private int[] counter; // for counting steps right
@@ -20,8 +19,12 @@ public class Sweeper {
 	private int[][] board;
 	private int numsections;
 
-	private boolean[] donesweep; // to signal that we're doing one last updown check
-	private boolean[] donephaseone; // to signal that we've arrived at the starting point
+	private boolean[] donesweep; // to signal that we're doing one last updown
+									// check
+	private boolean[] donephaseone; // to signal that we've arrived at the
+									// starting point
+
+	private G4Light[] claimed;
 	private ArrayList<Point2D> leftmostpoint;
 	private ArrayList<Point2D> rightmostpoint;
 	private AStar star;
@@ -30,6 +33,7 @@ public class Sweeper {
 		counter = new int[numsections];
 		lasttimeup = new boolean[numsections];
 		donesweep = new boolean[numsections];
+		claimed = new G4Light[numsections];
 		this.star = star;
 		this.board = board;
 		this.numsections = numsections;
@@ -39,41 +43,87 @@ public class Sweeper {
 	}
 
 	// should enumerate but lazy
-	public boolean doSweep(G4Light ml, int section) {
-		//move to start point
-		if (!donephaseone[section]) {
-			donephaseone[section] = moveToPoint(ml, leftmostpoint.get(section).getX(), leftmostpoint.get(section).getY());
-			return true;
+	public boolean doSweep(G4Light ml, int section, int[][] mosquitoboard) {
+		log.trace(Utils.toString(claimed));
+		if (claimed[section] == null) {
+			claimed[section] = ml;
+			if (ml.isDispatched()) {
+			log.trace("claiming " + section + " unclaiming " + ml.dispatchedSection);
+			claimed[ml.dispatchedSection] = null;
+			ml.dispatchedSection = section;
+			}
+		}
+		
+		if (ml.isDispatched())
+			section = ml.dispatchedSection;
+		// if (ml.waiting()) {
+		// return true;
+		// }
+		// move to start point
+		Point2D destination = ml.getDestination();
+		Point2D location = ml.getLocation();
+		double sectionX = leftmostpoint.get(section).getX();
+		double sectionY = leftmostpoint.get(section).getY();
+		if (!donephaseone[section] && claimed[section] == ml) {
+			if (location.getX() != sectionX || location.getY() != sectionY) {
+				if (!(destination.getX() == sectionX && destination.getY() == sectionY)) {
+					ArrayList<Point2D.Double> starPath = star.getPath(
+							new Point2D.Double(ml.getX(), ml.getY()),
+							new Point2D.Double(sectionX, sectionY));
+					ml.setPath(starPath);
+					ml.setDestination(sectionX, sectionY);
+				}
+
+				Point2D.Double np = ml.getNextPoint();
+				ml.moveTo(np.x, np.y);
+				if (ml.getX() == np.x && ml.getY() == np.y)
+					ml.incrementPath();
+
+				// donephaseone[section] = moveToPoint(ml,
+				// leftmostpoint.get(section).getX(),
+				// leftmostpoint.get(section).getY());
+
+				return true;
+			} else {
+				donephaseone[section] = true;
+				ml.hasDestination = false;
+			}
 		}
 
-		if (!ml.destinationReached() && ml.hasDestination){
+		if (!ml.destinationReached() && ml.hasDestination) {
 			Point2D.Double np = ml.getNextPoint();
 			Point2D mlPoint = new Point2D.Double(ml.getX(), ml.getY());
 
-		/*	log.trace(np.distance(mlPoint));
-			log.trace("currently at:" + ml.getX() + ", " + ml.getY());
-			log.trace("moving to:" + np.x + ", " + np.y);
-			log.trace("distance : " + (np.distance(mlPoint))); */ // Debugging distance error
+			/*
+			 * log.trace(np.distance(mlPoint)); log.trace("currently at:" +
+			 * ml.getX() + ", " + ml.getY()); log.trace("moving to:" + np.x +
+			 * ", " + np.y); log.trace("distance : " + (np.distance(mlPoint)));
+			 */// Debugging distance error
 			ml.moveTo(np.x, np.y);
 			if (ml.getX() == np.x && ml.getY() == np.y)
 				ml.incrementPath();
 			return true;
-		}
-		else if (ml.hasDestination && ml.destinationReached())
-			return true;
-		else {
-			int mymove = justGo(section, (int)ml.getX(), (int)ml.getY());
-			switch (mymove){
+		} else {
+			int mymove = justGo(section, (int) ml.getX(), (int) ml.getY());
+			switch (mymove) {
 			case -2:
+				// done sweepin or at collector
 				// done
 				// just go left when done for now for easy visualization
-				ArrayList<Point2D.Double> starPath = star.getPath(new Point2D.Double(ml.getX(), ml.getY()), new Point2D.Double(50,50));
-				ml.setPath(starPath);
-				log.trace("Printing path:");
-				ml.printPath();
-				return false;
+				ml.setDispatched(false);
+				section = findUnclaimedSection(ml);
+				if (section == -1) {
+					
+					ArrayList<Point2D.Double> starPath = star.getPath(
+							new Point2D.Double(ml.getX(), ml.getY()),
+							new Point2D.Double(50, 50));
+					ml.setPath(starPath);
+				}
+				// log.trace("Printing path:");
+				// ml.printPath();
+				return true;
 			case -1:
-				//not imp: gen error handling whatever
+				// not imp: gen error handling whatever
 				return true;
 			case 1:
 				ml.moveUp();
@@ -90,24 +140,39 @@ public class Sweeper {
 		}
 	}
 
-	public int justGo(int section, int x, int y)  {
+	private int findUnclaimedSection(G4Light ml) {
+		int section = -1;
+		for (int i = 0; i < claimed.length; i++) {
+			if (claimed[i] == null) {
+				claimed[i] = ml;
+				section = i;
+
+				ml.setDispatched(true);
+				ml.dispatchedSection = i;
+				break;
+			}
+		}
+		return section;
+	}
+
+	public int justGo(int section, int x, int y) {
 		if (section >= numsections) {
 			return -1;
 		}
 
 		// if we see the end
 		if (x + CONFIDENCE_AREA > rightmostpoint.get(section).getX()) {
-			//	log.trace("found end condition");
+			// log.trace("found end condition");
 			counter[section] = 0;
-			// "done" in the sense that we still have to go up or down one last time
+			// "done" in the sense that we still have to go up or down one last
+			// time
 			donesweep[section] = true;
 		}
-
 
 		int move = goUpDown(section, x, y, false);
 		// done our final sweep, officially done the sweep
 		if (move == -1 && donesweep[section]) {
-			//		log.trace("breaking out");
+			// log.trace("breaking out");
 			donesweep[section] = false;
 
 			return -2;
@@ -117,10 +182,10 @@ public class Sweeper {
 			// moving right
 		} else {
 			// end of board gtfo, don't think it ever goes here anymore?
-			if(x + 2 == 100) {
+			if (x + 2 == 100) {
 				return -1;
 				// on a diagonal
-			} else if(x + 2 < 100 && board[x + 2][y] != section) {
+			} else if (x + 2 < 100 && board[x + 2][y] != section) {
 				move = goUpDown(section, x, y, true);
 				if (move == -1) {
 					lasttimeup[section] = !lasttimeup[section];
@@ -132,7 +197,7 @@ public class Sweeper {
 				counter[section]++;
 			}
 			return move;
-		}	
+		}
 	}
 
 	private int goUpDown(int section, int x, int y, boolean isondiagonal) {
@@ -143,23 +208,26 @@ public class Sweeper {
 		// if we were going up last time try to keep going that way
 		if (lasttimeup[section]) {
 			if (y - padding > 0 && board[x][y - padding] == section) {
-				//			log.trace("going up, x: " + x + ", y: " + y + ", section: " + section);
-				return 1; //north
-				// reached a perimeter, signal that we need to start heading right now
+				// log.trace("going up, x: " + x + ", y: " + y + ", section: " +
+				// section);
+				return 1; // north
+				// reached a perimeter, signal that we need to start heading
+				// right now
 			} else {
 				lasttimeup[section] = false;
 				return -1;
 			}
 		} else {
 			if (y + padding < 100 && board[x][y + padding] == section) {
-				//			log.trace("going down, x: " + x + ", y: " + y + ", section: " + section);
+				// log.trace("going down, x: " + x + ", y: " + y + ", section: "
+				// + section);
 				return 3; // south
 			} else {
 				lasttimeup[section] = true;
 				return -1;
 			}
 		}
-	}	
+	}
 
 	// find our start point
 	private void findLeftmost() {
@@ -176,19 +244,27 @@ public class Sweeper {
 			}
 		}
 
-		// be warned this sucks and is confusing but it's trying to find an optimal starting point (and kinda succeeding..)
+		// be warned this sucks and is confusing but it's trying to find an
+		// optimal starting point (and kinda succeeding..)
 		for (int thissection = 0; thissection < numsections; thissection++) {
 			double myx = leftmostpoint.get(thissection).getX();
 			double myy = leftmostpoint.get(thissection).getY();
 			boolean foundbetter = false;
 			for (int i = -12; i < CONFIDENCE_AREA; i++) {
 				for (int j = 0; j < CONFIDENCE_AREA; j++) {
-					if (myx + i < 100 && myy + j < 100 && myx + i > 0 && myy + j > 0 && board[(int) (myx + i)][(int) (myy + j)] == thissection) {
-						if((myx + i < 88 && myx + i > 12) && (myy + j < 88 && myy + j > 12)) {
-							leftmostpoint.set(thissection, new Point( (int)(myx + i), (int) (myy + j)) );
+					if (myx + i < 100
+							&& myy + j < 100
+							&& myx + i > 0
+							&& myy + j > 0
+							&& board[(int) (myx + i)][(int) (myy + j)] == thissection) {
+						if ((myx + i <= 88 && myx + i >= 12)
+								&& (myy + j <= 88 && myy + j >= 12)) {
+							leftmostpoint.set(thissection, new Point(
+									(int) (myx + i), (int) (myy + j)));
 							foundbetter = true;
-						} else if(!foundbetter) {
-							leftmostpoint.set(thissection, new Point( (int) (myx + i), (int)(myy + j)) );
+						} else if (!foundbetter) {
+							leftmostpoint.set(thissection, new Point(
+									(int) (myx + i), (int) (myy + j)));
 						}
 					}
 				}
@@ -211,7 +287,7 @@ public class Sweeper {
 
 	}
 
-	public boolean moveToPoint(G4Light inlight, double x, double y) {	
+	public boolean moveToPoint(G4Light inlight, double x, double y) {
 		log.trace(inlight.getX() + " " + inlight.getY() + " " + x + " " + y);
 		Point2D current = new Point2D.Double(inlight.getX(), inlight.getY());
 		Point2D dest = new Point2D.Double(x, y);
@@ -226,9 +302,7 @@ public class Sweeper {
 		return (step.distance(dest) == 0);
 	}
 
-
-
-	public ArrayList<Point2D> getStartingPoints(){
+	public ArrayList<Point2D> getStartingPoints() {
 		return leftmostpoint;
 	}
 }

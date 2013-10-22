@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Stack;
 
+import mosquito.g4.G4Light;
 import mosquito.g4.voronoi.LineParam;
 
 public class Utils {
@@ -134,4 +135,15 @@ public class Utils {
         // TODO: doesn't work
         System.out.println(getNextStep(1, 1, -1, -1));
     }
+
+	public static String toString(G4Light[] claimed) {
+		StringBuilder builder = new StringBuilder();
+		
+		for (G4Light l : claimed) {
+			int i = l == null ? -1 : l.id;
+			builder.append(i);
+		}
+		
+		return builder.toString();
+	}
 }
