@@ -1,5 +1,7 @@
 package mosquito.g4;
 
+//import G4Light;
+
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -73,6 +75,42 @@ public class VoronoiPlayer extends Player {
      * board[x][y] tells you the number of mosquitoes at coordinate (x, y)
      */
     public Set<Light> getLights(int[][] board) {
+    	int[][] secboard = sections.getSectionBoard();
+    	HashSet<Integer> seen = new HashSet<Integer>();
+    	for (int count = 0; count < 100; count++) {
+    		int section;
+    		if(!seen.contains(secboard[0 + count][0])) {
+    			seen = addLight(secboard[0 + count][0], seen);
+    	            if(seen.size() == numLights) break;
+    		}
+    		if (!seen.contains(secboard[99 - count][99])) {
+    			seen = addLight(secboard[99 - count][99], seen);
+    	            if(seen.size() == numLights) break;
+    		}
+    		if (!seen.contains(secboard[99][0 + count])) {
+    			seen = addLight(secboard[99][0 + count], seen);
+    	            if(seen.size() == numLights) break;
+    		}
+    		if (!seen.contains(secboard[0][99 - count])) {
+    			seen = addLight(secboard[0][99 - count], seen);
+    	            if(seen.size() == numLights) break;
+    		}
+    	}
+    	
+    	int numleftover = numLights - seen.size();
+    	outerloop:
+    	for (int i = 0; i < numleftover; i++) {
+    		for(int section = 0; section < v.getNumSections(); section++) {
+    			if (!seen.contains(section)) {
+    	            lights.add(new G4Light(s.getStartingPoints().get(section).getX(), s
+    	                    .getStartingPoints().get(section).getY(), i));
+    	            seen.add(section);
+    	            if (seen.size() == numLights) {
+    	            	break outerloop;
+    	            }
+    			}
+    		}
+    	}
     	int del = v.getNumSections()/numLights;
 //    	for (int i = 0; i < numLights; i++) {
 //    		int startsec = i + 
@@ -88,6 +126,13 @@ public class VoronoiPlayer extends Player {
         return lights;
     }
 
+    private HashSet<Integer> addLight(int section, HashSet<Integer> seen) {
+        lights.add(new G4Light(s.getStartingPoints().get(section).getX(), s
+                .getStartingPoints().get(section).getY(), section));
+        seen.add(section);
+        return seen;
+    }
+    
     /*
      * This is called at the beginning of each step (before the mosquitoes have
      * moved) If your Set contains additional lights, an error will occur. Also,

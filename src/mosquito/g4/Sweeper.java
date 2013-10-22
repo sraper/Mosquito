@@ -188,11 +188,11 @@ public class Sweeper {
 			return -2;
 			// sweeping in upward or downward direction
 		} else if (counter[section] % 12 == 0 && move != -1) {
-			isondiagonal[section] = true;
+	//		isondiagonal[section] = true;
 			return move;
 			// moving right
 		} else {
-			isondiagonal[section] = true;
+	//		isondiagonal[section] = true;
 			// end of board gtfo, don't think it ever goes here anymore?
 			if (x + 2 == 100) {
 				return -1;
@@ -214,6 +214,9 @@ public class Sweeper {
 				move = 2;
 				counter[section]++;
 			}
+			if(counter[section] % 12 == 0) {
+				lasttimeup[section] = !lasttimeup[section];
+			}
 			return move;
 		}
 	}
@@ -232,9 +235,9 @@ public class Sweeper {
 				// reached a perimeter, signal that we need to start heading
 				// right now
 			} else {
-				if (!isondiagonal[section]) {
-					lasttimeup[section] = false;
-				}
+		//		if (!isondiagonal[section]) {
+		//			lasttimeup[section] = false;
+		//		}
 				return -1;
 			}
 		} else {
@@ -243,9 +246,9 @@ public class Sweeper {
 				// + section);
 				return 3; // south
 			} else {
-				if (!isondiagonal[section]) {
-					lasttimeup[section] = true;
-				}
+		//		if (!isondiagonal[section]) {
+		//			lasttimeup[section] = true;
+		//		}
 				return -1;
 			}
 		}
