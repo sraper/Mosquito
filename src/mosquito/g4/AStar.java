@@ -83,6 +83,17 @@ public class AStar {
 				Point2D.Double firstPoint = finalPath.get(0);
 				for (int i=0; i<12; i++)
 					finalPath.add(0, firstPoint);
+				int i=0;
+				while (i < finalPath.size()){
+					if (i % 30 == 0){
+						Point2D.Double randomPoint = finalPath.get(i);
+						for (int j=0;j<5;j++){
+							finalPath.add(i, randomPoint);
+						}
+						i+=6;
+					}
+					i++;
+				}
 				return finalPath;
 			}
 			closedSet.add(current);
@@ -90,19 +101,23 @@ public class AStar {
 			for (Point neighbor : neighbors){
 				int score = 1;
 				if (!Utils.hasStraightPath(current, neighbor, walls))
-					score += 50000;
+					score += 1000000;
 				for (Point nb2 : getNeighbors(neighbor)){
 					if (!Utils.hasStraightPath(neighbor, nb2, walls))
-						score += 20000;
-			/*		for (Point nb3 : getNeighbors(nb2)){
+						score += 900000;
+					for (Point nb3 : getNeighbors(nb2)){
 						if (!Utils.hasStraightPath(nb2, nb3, walls))
-							score += 2000;
+							score += 90000;
 					/*	for (Point nb4 : getNeighbors(nb3)){
 							if (!Utils.hasStraightPath(nb3, nb4, walls))
 								score += 200;
-							
-						} */
-					//} */
+							for (Point nb5 : getNeighbors(nb4)){
+								if (!Utils.hasStraightPath(nb5, nb4, walls))
+									score += 100;
+								
+							}  
+						}  */
+					} 
 				}
 				int neighbor_cost = current.score + score;
 				if (closedSet.contains(neighbor))

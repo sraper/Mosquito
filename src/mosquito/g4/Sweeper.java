@@ -56,7 +56,7 @@ public class Sweeper {
 			}
 		}
 		if (done && !ml.isDispatched()) {
-			return ml.hunt();
+			return ml.hunt(star, mosquitoboard);
 		}
 		if (ml.isDispatched())
 			section = ml.dispatchedSection;
