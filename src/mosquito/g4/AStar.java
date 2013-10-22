@@ -18,31 +18,7 @@ public class AStar {
 
 	public AStar(Set<Line2D> walls){
 		this.walls = walls; 
-		/*
-		wallMap = new int[100][100];
-		if (walls.isEmpty()){
-			for (int i=0; i< 100; i++){
-				for (int j=0;j< 100; j++){
-					wallMap[i][j] = 1;
-				}
-			}
-		}
-		else {
-			for (Line2D wall : walls){
-				for (int i=0; i< 100; i++){
-					for (int j=0;j< 100; j++){
-						if (wall.contains(new Point2D.Double(i,j))){
-							wallMap[i][j] = 40000;
-						}
-						else if (wallMap[i][j] != Integer.MAX_VALUE && wallMap[i][j] != 1)
-							wallMap[i][j] = 1;
-					}
-				}
-			}
-		} 
-		System.err.println("PRINTING OUT WALLMAP");
-		Utils.print(System.err, wallMap);
-		System.err.println("PRINTING OUT AFTER WALLMAP"); */
+	
 	}
 
 	private ArrayList<Point> getNeighbors(Point2D.Double point){
@@ -104,7 +80,9 @@ public class AStar {
 			Point current = openSet.poll();
 			if (current.x == end.x && current.y == end.y){
 				ArrayList<Point2D.Double> finalPath = reconstructPath(cameFrom, current);
-				finalPath.remove(0);
+				Point2D.Double firstPoint = finalPath.get(0);
+				for (int i=0; i<12; i++)
+					finalPath.add(0, firstPoint);
 				return finalPath;
 			}
 			closedSet.add(current);
@@ -115,14 +93,15 @@ public class AStar {
 					score += 50000;
 				for (Point nb2 : getNeighbors(neighbor)){
 					if (!Utils.hasStraightPath(neighbor, nb2, walls))
-						score += 5000;
+						score += 20000;
 					for (Point nb3 : getNeighbors(nb2)){
 						if (!Utils.hasStraightPath(nb2, nb3, walls))
-							score += 500;
-						for (Point nb4 : getNeighbors(nb3)){
+							score += 2000;
+					/*	for (Point nb4 : getNeighbors(nb3)){
 							if (!Utils.hasStraightPath(nb3, nb4, walls))
-								score += 50;
-						}
+								score += 200;
+							
+						} */
 					}
 				}
 				int neighbor_cost = current.score + score;

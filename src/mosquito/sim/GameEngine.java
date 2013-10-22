@@ -154,19 +154,54 @@ public final class GameEngine
 			for (Mosquito m : board.getMosquitos()) {
 				if (!m.caught) {
 					Point2D location = m.location;
-					count[(int)location.getX()][(int)location.getY()]++;
+					// see if we can just cast x and y to ints
+					int x = (int)location.getX();
+					int y = (int)location.getY();
+					
+					boolean obstructed = checkObstruction(x, y, location);
+					
+					if (obstructed) {
+						// try the opposite corner
+						x++;
+						y++;
+						obstructed = checkObstruction(x, y, location);
+						
+						if (obstructed) {
+							x--; // back to original x
+							obstructed = checkObstruction(x, y, location);
+							
+							if (obstructed) {
+								x++;
+								y--; // back to original y
+								obstructed = checkObstruction(x, y, location);
+
+								if (obstructed) {
+									// rut-roh
+									System.err.println("WARNING! Cannot record location of mosquito at (" + location.getX() + "," + location.getY() + ")");
+								}
+							}
+						}
+					}
+					//System.err.println("Using (" + x + "," + y + ")");
+					if (x < 0 || y < 0 || x >= 100 || y >= 100) {
+						System.err.println("WARNING! Computed location out of bounds for mosquito at (" + location.getX() + "," + location.getY() + ")");
+					}
+					else count[x][y]++;
 				}
 			}
 			
 			/* DEBUG */
-			/*
+			int sum = 0;
 			for (int j = 0; j < 100; j++) {
 				for (int i = 0; i < 100; i++) {
-					System.err.print(count[i][j] + " ");
+					sum += count[i][j];
+					//System.err.print(count[i][j] + " ");
 				}
-				System.err.println("||");
+				//System.err.println("||");
 			}
-			*/
+			if (sum + board.mosquitosCaught != config.getNumMosquitos()) {
+				System.err.println("WRONG NUMBER OF MOSQUITOS!");
+			}
 			
 			
 			// ask the Player for the new position of the lights
@@ -180,10 +215,9 @@ public final class GameEngine
 				lightArray = lights.toArray();
 				for (int i = 0; i < lights.size(); i++) {
 					Light a = (Light)lightArray[i];
-					if (distance(a.getX(), a.getY(), xCoords[i], yCoords[i]) > 15) {
+					if (distance(a.getX(), a.getY(), xCoords[i], yCoords[i]) > 1) {
 					//if ((Math.abs(a.getX()-xCoords[i]) > 1) || (Math.abs(a.getY() - yCoords[i]) > 1)) {
 						System.err.println("ERROR! light moved by more than one!");
-						System.err.printf("%f %f %f %f\n", a.getX(), a.getY(), xCoords[i], yCoords[i] );
 						System.exit(-1);
 					}
 					
@@ -222,7 +256,17 @@ public final class GameEngine
 		return true;
 	}
 
-	
+
+	private boolean checkObstruction(int x, int y, Point2D location) {
+		Line2D between = new Line2D.Double(x, y, location.getX(), location.getY());
+		for (Line2D w : board.getWalls()) {
+			if (between.intersectsLine(w)) {
+				//System.err.println("Mosquito at (" + location.getX() + "," + location.getY() + ") cannot get to (" + x + "," + y + ")");
+				return true;
+			}
+		}
+		return false;
+	}
 
 	private final static void printUsage()
 	{
