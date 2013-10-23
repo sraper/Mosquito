@@ -1,10 +1,16 @@
 package mosquito.g4;
 
+import java.util.List;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.PriorityQueue;
 
 import mosquito.g4.utils.Utils;
+import mosquito.g4.voronoi.Section;
+import mosquito.g4.voronoi.Sections;
+import mosquito.g4.voronoi.Voronoi;
 
 import org.apache.log4j.Logger;
 
@@ -30,8 +36,12 @@ public class Sweeper {
 	private ArrayList<Point2D> leftmostpoint;
 	private ArrayList<Point2D> rightmostpoint;
 	private AStar star;
+	private Sections s;
+	private Voronoi v;
 
-	public Sweeper(AStar star, int numsections, int[][] board) {
+	public Sweeper(AStar star, int numsections, int[][] board, Sections sections, Voronoi v) {
+		this.v = v;
+		s = sections;
 		counter = new int[numsections];
 		lasttimeup = new boolean[numsections];
 		donesweep = new boolean[numsections];
@@ -110,7 +120,7 @@ public class Sweeper {
 				ml.incrementPath();
 			return true;
 		} else {
-			int mymove = justGo(section, (int) ml.getX(), (int) ml.getY());
+			int mymove = justGo(section, (int) ml.getX(), (int) ml.getY(), mosquitoboard);
 			switch (mymove) {
 			case -2:
 				// done sweepin or at collector
@@ -161,8 +171,10 @@ public class Sweeper {
 		return section;
 	}
 
-	public int justGo(int section, int x, int y) {
-		
+	public int justGo(int section, int x, int y, int[][] mboard) {
+		if (abortEarly(mboard, section, x, y)) {
+			return -2;
+		}
 		
 		
 		
@@ -312,8 +324,69 @@ public class Sweeper {
 
 	}
 
-	private void abortEarly() {
+	private boolean abortEarly(int[][] mboard, int section, int x, int y) {
+		/*
+		 * for every point in the section
+		 * if there's a mosquito
+		 * return false
+		 * }}
+		 * return true;
+		 */
+//		HashSet<Integer> seen = new HashSet<Integer>();
+//		PriorityQueue<Section> pq = s.getSections();
+//		while(!pq.isEmpty()) {
+//			Section mysec = pq.poll();
+//			List<Point2D> secpoints = mysec.getPoints();
+//			for (Point2D p : secpoints) {
+//				double px = p.getX();
+//				double py = p.getY();
+//				
+//				if(mboard[px][py] > 0 && !lightwithin(5)) {
+//					
+//				}
+//			}
+//		}
 		
+		
+		List<Section> l = v.getSectionList();
+		Section thissec = null;
+		for (Section s : l) {
+			if(s.getId() == section) {
+				thissec = s;
+				break;
+			}
+		}
+		List<Point2D> secpoints = thissec.getPoints();
+		for(Point2D p : secpoints) {
+			int px = (int) p.getX();
+			int py = (int) p.getY();
+			if (mboard[px][py] > 0 && distance(x, y, px, py) > 5) {
+				return false;
+			}
+		}
+//		for (int i = 0; i < 100; i++) {
+//			for (int j = 0; j < 100; j++) {
+//				if (board[i][j] == section && mboard[i][j] > 0 && distance(x, y, i, j) > 5) {
+//					return false;
+//				}
+//			}
+//		}
+		return true;
+	}
+	
+//	private boolean lightwithin(int radius) {
+//		for(int i = -5; i < radius; i++) {
+//			for (int j = -5; j < radius; j++) {
+//				if(i >= 0 &&)
+//			}
+//		}
+//	}
+	
+	private double distance(int x1, int y1, int x2, int y2) {
+		int delx = Math.abs(x2 - x1);
+		int dely = Math.abs(y2 - y1);
+		
+		return Math.pow( (delx*delx) + (dely*dely), .5);
 	}
 	
 	

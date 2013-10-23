@@ -400,6 +400,10 @@ public class Voronoi {
     public Sections getSections() {
         return sections;
     }
+    
+    public List<Section> getSectionList() {
+    	return sectionsAsList;
+    }
 
     public static void main(String[] args) {
         Set<Line2D> walls = new HashSet<Line2D>();
