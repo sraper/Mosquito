@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import mosquito.g4.utils.GeometryUtils;
 import mosquito.g4.utils.Utils;
 
 /**
@@ -41,7 +42,7 @@ public class Voronoi {
 
     int[][] sectionIdBoard;
     double[][] scoreBoard;
-    boolean debug = true;
+    public boolean debug = true;
     private PointToSectionConverter converter;
 
     public Voronoi(int minSections, int boardSize, Collection<Line2D> walls) {
@@ -52,18 +53,6 @@ public class Voronoi {
 
     public void setupWalls(Collection<Line2D> walls) {
         this.walls = walls;
-        
-
-//        if (walls.isEmpty()) {
-//            createDefaultWall();
-//        }
-    }
-
-    public void createDefaultWall() {
-        List<Line2D> tempWall = new LinkedList<Line2D>();
-        tempWall.add(new Line2D.Double(0, 50.1, 100, 50.1));
-
-        this.walls = tempWall;
     }
 
     public void doVoronoi() {
@@ -88,13 +77,56 @@ public class Voronoi {
             Voronoi.conditionallyAddPoint(list, p1, 0, boardSize);
             Voronoi.conditionallyAddPoint(list, p2, 0, boardSize);
         }
-        
+
+        List<Point2D> intersectionPoints = createIntersectionVoronoiPoints();
+
+        list.addAll(intersectionPoints);
+
         if (list.isEmpty()) {
-        	list.add(new Point2D.Double(0,0));
+            list.add(new Point2D.Double(0, 0));
         }
 
         removeUnneededPoints(list);
         setVoronoiPoints(list);
+        System.err.println(list);
+    }
+
+    private List<Point2D> createIntersectionVoronoiPoints() {
+        Set<Point2D> intersectedPoints = new HashSet<Point2D>();
+
+        for (Line2D wall : walls) {
+            for (Line2D wall2 : walls) {
+                if (wall == wall2)
+                    continue;
+
+                Point2D[] intersect = new Point2D[1];
+
+                boolean isIntersecting = GeometryUtils
+                        .findLineSegmentIntersection(wall, wall2, intersect);
+
+                if (isIntersecting) {
+                    intersectedPoints.add(intersect[0]);
+                    System.err.println("" + "intersection at " + intersect[0]);
+                }
+            }
+        }
+
+        List<Point2D> newPoints = new LinkedList<Point2D>();
+
+        for (Point2D p : intersectedPoints) {
+            makePointsFromIntersectionPoint(newPoints, p);
+        }
+
+        return newPoints;
+    }
+
+    public void makePointsFromIntersectionPoint(List<Point2D> newPoints,
+            Point2D p) {
+        final double offset = .2;
+        newPoints.add(new Point2D.Double(p.getX() + offset, p.getY() + offset));
+        newPoints.add(new Point2D.Double(p.getX() - offset, p.getY() + offset));
+        newPoints.add(new Point2D.Double(p.getX() + offset, p.getY() - offset));
+        newPoints.add(new Point2D.Double(p.getX() - offset, p.getY() - offset));
     }
 
     public void removeUnneededPoints(LinkedList<Point2D> list) {
@@ -135,7 +167,7 @@ public class Voronoi {
 
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
-                sectionIdBoard[i][j] = 0;
+                sectionIdBoard[i][j] = -1;
                 scoreBoard[i][j] = Double.MAX_VALUE;
             }
         }
@@ -145,8 +177,11 @@ public class Voronoi {
         int i = 0;
 
         for (Point2D point : voronoiPoints) {
+            // System.err.println("Sectioning using " + Utils.itoa(i)
+            // + " at point " + point);
             calculateDistance(point, i);
             ++i;
+            // printSectionBoard();
         }
 
         this.setNumSections(i);
@@ -174,7 +209,8 @@ public class Voronoi {
         if (Utils.hasStraightPath(point, target, walls)) {
             double distance = point.distance(target);
 
-            if (sectionIdBoard[i][j] == -1 || distance < scoreBoard[i][j]) {
+            boolean unoccupied = sectionIdBoard[i][j] == -1;
+            if (unoccupied || distance < scoreBoard[i][j]) {
                 sectionIdBoard[i][j] = sectionId;
                 scoreBoard[i][j] = distance;
             }
@@ -182,9 +218,7 @@ public class Voronoi {
     }
 
     private void printSectionBoard() {
-        if (debug) {
-            Utils.print(System.err, sectionIdBoard);
-        }
+        Utils.print(System.err, sectionIdBoard);
     }
 
     private void createSections() {
