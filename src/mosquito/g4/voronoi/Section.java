@@ -17,7 +17,7 @@ public class Section implements Comparable<Section> {
         return id;
     }
 
-    private void setId(int id) {
+    void setId(int id) {
         this.id = id;
     }
 
@@ -50,5 +50,9 @@ public class Section implements Comparable<Section> {
 
     public int hashCode() {
         return getId();
+    }
+
+    public String toString() {
+        return getId() + " " + getPopulation();
     }
 }

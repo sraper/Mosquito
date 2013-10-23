@@ -28,7 +28,7 @@ import mosquito.g4.utils.Utils;
 // of points behind the obstacle, then these points get a section id of '-1'
 
 public class Voronoi {
-    private static final double MIN_DISTANCE = .5;
+    private static final double MIN_DISTANCE = .25;
     private Sections sections;
     private List<Section> sectionsAsList;
 
@@ -60,8 +60,50 @@ public class Voronoi {
         setupBoards();
         calculateDistances();
         createSections();
+        pruneEmptySections();
         System.err.println("Created " + getNumSections() + " sections");
         printSectionBoard();
+    }
+
+    private void pruneEmptySections() {
+        List<Integer> empties = new LinkedList<Integer>();
+        for (Section s : sections.getSections()) {
+            if (s.getPoints().isEmpty()) {
+                empties.add(s.getId());
+            }
+        }
+
+        int numRemoved = 0;
+
+        for (Integer i : empties) {
+            sectionsAsList.remove(i - numRemoved);
+            ++numRemoved;
+        }
+
+        int i = 0;
+
+        for (Section s : sectionsAsList) {
+            s.setId(i);
+            ++i;
+        }
+
+        this.numSections = sectionsAsList.size();
+
+        sections.getSections().clear();
+        sections.getSections().addAll(sectionsAsList);
+
+        redoSectionIdBoard();
+    }
+
+    private void redoSectionIdBoard() {
+        for (Section s : sectionsAsList) {
+            for (Point2D p : s.getPoints()) {
+                int x = (int) p.getX();
+                int y = (int) p.getY();
+
+                sectionIdBoard[x][y] = s.getId();
+            }
+        }
     }
 
     private void createVornoiPoints() {
@@ -120,13 +162,16 @@ public class Voronoi {
         return newPoints;
     }
 
-    public void makePointsFromIntersectionPoint(List<Point2D> newPoints,
+    public static void makePointsFromIntersectionPoint(List<Point2D> newPoints,
             Point2D p) {
-        final double offset = .2;
-        newPoints.add(new Point2D.Double(p.getX() + offset, p.getY() + offset));
-        newPoints.add(new Point2D.Double(p.getX() - offset, p.getY() + offset));
-        newPoints.add(new Point2D.Double(p.getX() + offset, p.getY() - offset));
-        newPoints.add(new Point2D.Double(p.getX() - offset, p.getY() - offset));
+        newPoints.add(new Point2D.Double(p.getX() + MIN_DISTANCE, p.getY()
+                + MIN_DISTANCE));
+        newPoints.add(new Point2D.Double(p.getX() - MIN_DISTANCE, p.getY()
+                + MIN_DISTANCE));
+        newPoints.add(new Point2D.Double(p.getX() + MIN_DISTANCE, p.getY()
+                - MIN_DISTANCE));
+        newPoints.add(new Point2D.Double(p.getX() - MIN_DISTANCE, p.getY()
+                - MIN_DISTANCE));
     }
 
     public void removeUnneededPoints(LinkedList<Point2D> list) {
@@ -218,7 +263,8 @@ public class Voronoi {
     }
 
     private void printSectionBoard() {
-        Utils.print(System.err, sectionIdBoard);
+        Utils.print(System.err, sectionIdBoard, true);
+        Utils.print(System.err, sectionIdBoard, false);
     }
 
     private void createSections() {
@@ -267,12 +313,11 @@ public class Voronoi {
 
             if (this.sectionIdBoard[i][j] == -1) {
                 if (Utils.withinBounds(0, boardSize, i + 1)
-                        && Utils.withinBounds(0, boardSize, j + 1)) {
-                    this.sectionIdBoard[i][j] = this.sectionIdBoard[i + 1][j + 1];
+                        && Utils.withinBounds(0, boardSize, j)) {
+                    this.sectionIdBoard[i][j] = this.sectionIdBoard[i + 1][j];
                 } else if (Utils.withinBounds(0, boardSize, i - 1)
-                        && Utils.withinBounds(0, boardSize, j - 1)) {
-                    this.sectionIdBoard[i][j] = this.sectionIdBoard[i - 1][j - 1];
-
+                        && Utils.withinBounds(0, boardSize, j)) {
+                    this.sectionIdBoard[i][j] = this.sectionIdBoard[i - 1][j];
                 }
             }
         }

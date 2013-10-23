@@ -57,14 +57,20 @@ public class Utils {
         return d >= minDim && d < maxDim;
     }
 
-    public static void print(PrintStream stream, int[][] array) {
+    public static void print(PrintStream stream, int[][] array, boolean useChar) {
         for (int i = 0; i < array.length; i++) {
             for (int j = 0; j < array[0].length; j++) {
                 int val = array[j][i];
-                stream.print(String.format(val < 10 ? "0%d " : "%d ", val));
+                char c = itoa(val);
+                stream.print(useChar ? c + " " : String.format(
+                        val < 10 ? "0%d " : "%d ", val));
             }
             stream.println();
         }
+    }
+
+    private static char itoa(int val) {
+        return (char) (val + (int) '!');
     }
 
     public static <T> T getRandomElement(List<T> list) {
@@ -136,14 +142,14 @@ public class Utils {
         System.out.println(getNextStep(1, 1, -1, -1));
     }
 
-	public static String toString(G4Light[] claimed) {
-		StringBuilder builder = new StringBuilder();
-		
-		for (G4Light l : claimed) {
-			int i = l == null ? -1 : l.id;
-			builder.append(i);
-		}
-		
-		return builder.toString();
-	}
+    public static String toString(G4Light[] claimed) {
+        StringBuilder builder = new StringBuilder();
+
+        for (G4Light l : claimed) {
+            int i = l == null ? -1 : l.id;
+            builder.append(i);
+        }
+
+        return builder.toString();
+    }
 }
