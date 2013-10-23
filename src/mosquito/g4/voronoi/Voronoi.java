@@ -222,11 +222,11 @@ public class Voronoi {
         int i = 0;
 
         for (Point2D point : voronoiPoints) {
-            // System.err.println("Sectioning using " + Utils.itoa(i)
-            // + " at point " + point);
+            System.err.println("Sectioning using " + Utils.itoa(i)
+                    + " at point " + point);
             calculateDistance(point, i);
             ++i;
-            // printSectionBoard();
+            printSectionBoard();
         }
 
         this.setNumSections(i);
@@ -298,26 +298,13 @@ public class Voronoi {
 
     private void assignMissedElements() {
 
-        assignMissedElement(0, 0);
-
-        for (int i = 1; i < boardSize; i++) {
-            assignMissedElement(i, 0);
-            assignMissedElement(0, i);
-        }
-    }
-
-    private void assignMissedElement(int i, int j) {
-        if (Utils.withinBounds(0, boardSize, i)
-                && Utils.withinBounds(0, boardSize, j)) {
-            assignMissedElement(i + 1, j + 1);
-
-            if (this.sectionIdBoard[i][j] == -1) {
-                if (Utils.withinBounds(0, boardSize, i + 1)
-                        && Utils.withinBounds(0, boardSize, j)) {
-                    this.sectionIdBoard[i][j] = this.sectionIdBoard[i + 1][j];
-                } else if (Utils.withinBounds(0, boardSize, i - 1)
-                        && Utils.withinBounds(0, boardSize, j)) {
-                    this.sectionIdBoard[i][j] = this.sectionIdBoard[i - 1][j];
+        for (int i = 0; i < boardSize; i++) {
+            for (int j = 0; j < boardSize; j++) {
+                if (sectionIdBoard[i][j] == -1) {
+                    Section s = new Section(numSections);
+                    sectionsAsList.add(s);
+                    s.addPoint(new Point2D.Double(i, j));
+                    ++numSections;
                 }
             }
         }
@@ -400,9 +387,9 @@ public class Voronoi {
     public Sections getSections() {
         return sections;
     }
-    
+
     public List<Section> getSectionList() {
-    	return sectionsAsList;
+        return sectionsAsList;
     }
 
     public static void main(String[] args) {

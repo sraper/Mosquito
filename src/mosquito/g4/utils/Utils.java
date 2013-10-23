@@ -69,7 +69,7 @@ public class Utils {
         }
     }
 
-    private static char itoa(int val) {
+    public static char itoa(int val) {
         return (char) (val + (int) '!');
     }
 
