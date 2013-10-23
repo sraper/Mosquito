@@ -80,7 +80,7 @@ public class Sweeper {
 		Point2D location = ml.getLocation();
 		double sectionX = leftmostpoint.get(section).getX();
 		double sectionY = leftmostpoint.get(section).getY();
-		if (!donephaseone[section] && claimed[section] == ml) {
+		if (!donephaseone[section] && claimed[section] == ml && !abortEarly(mosquitoboard, section,(int) ml.getY(),(int) ml.getY())) {
 			if (location.getX() != sectionX || location.getY() != sectionY) {
 				if (!(destination.getX() == sectionX && destination.getY() == sectionY)) {
 					ArrayList<Point2D.Double> starPath = star.getPath(
