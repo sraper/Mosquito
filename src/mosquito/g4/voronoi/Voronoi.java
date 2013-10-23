@@ -135,7 +135,7 @@ public class Voronoi {
 
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
-                sectionIdBoard[i][j] = 0;
+                sectionIdBoard[i][j] = -1;
                 scoreBoard[i][j] = Double.MAX_VALUE;
             }
         }
@@ -320,6 +320,10 @@ public class Voronoi {
 
     public Sections getSections() {
         return sections;
+    }
+    
+    public List<Section> getSectionList() {
+    	return sectionsAsList;
     }
 
     public static void main(String[] args) {
