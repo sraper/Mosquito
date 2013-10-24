@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import mosquito.sim.MoveableLight;
 
@@ -39,6 +40,8 @@ public	int id;
 
 	private boolean stayPut;
 
+	private LinkedList<Point2D> pastPoints;
+	
 	public Point2D getDestination() {
 		return new Point2D.Double(dest_x, dest_y);
 	}
@@ -104,6 +107,31 @@ public	int id;
 		super(x, y, true);
 		this.id = id;
 		isDispatched = true;
+		this.dispatchedSection = -1;
+		this.pastPoints = new LinkedList<Point2D>();
+	}
+	
+	public boolean isStuck() {
+		log.trace(pastPoints.toString());
+		if (pastPoints.size() <= 50) return false;
+		
+		Point2D lastPoint = pastPoints.peek();
+		for (Point2D p : pastPoints) {
+			if(!p.equals(lastPoint)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public void clearPastPoints(){	
+		this.pastPoints = new LinkedList<Point2D>();
+	}
+	
+	public void addPoint(Point2D p) {
+		if(pastPoints.size() > 50) pastPoints.pop();
+		
+		pastPoints.add(p);
 	}
 
 	public void setDestination(double x, double y) {

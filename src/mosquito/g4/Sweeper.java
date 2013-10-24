@@ -57,13 +57,38 @@ public class Sweeper {
 
 	// should enumerate but lazy
 	public boolean doSweep(G4Light ml, int section, int[][] mosquitoboard) {
+		if (ml.isStuck() && ml.getX() != 50 && ml.getY() != 50) {
+			log.trace("what");
+			ml.clearPastPoints();
+			ml.setDispatched(false);
+			section = findUnclaimedSection(ml);
+			if (section == -1) {
+				
+				ArrayList<Point2D.Double> starPath = star.getPath(
+						new Point2D.Double(ml.getX(), ml.getY()),
+						new Point2D.Double(50, 50));
+				ml.setPath(starPath);
+			}
+			// hmm not sure about this
+			if (section != ml.dispatchedSection) {
+				claimed[ml.dispatchedSection] = null;
+			}
+//			ml.setDispatched(false);
+//			ArrayList<Point2D.Double> starPath = star.getPath(
+//					new Point2D.Double(ml.getX(), ml.getY()),
+//					new Point2D.Double(50, 50));
+//			ml.setPath(starPath);
+//			section = -1;
+		}
+		
+		
 		log.trace(Utils.toString(claimed));
 		boolean done = ml.hasDestination && ml.destinationReached();
-		if (claimed[section] == null) {
+		if (section != -1 && claimed[section] == null) {
 			claimed[section] = ml;
 			if (ml.isDispatched()) {
 			log.trace("claiming " + section + " unclaiming " + ml.dispatchedSection);
-			claimed[ml.dispatchedSection] = null;
+			if (ml.dispatchedSection != -1) claimed[ml.dispatchedSection] = null;
 			ml.dispatchedSection = section;
 			}
 		}
@@ -76,11 +101,12 @@ public class Sweeper {
 		// return true;
 		// }
 		// move to start point
-		Point2D destination = ml.getDestination();
-		Point2D location = ml.getLocation();
-		double sectionX = leftmostpoint.get(section).getX();
-		double sectionY = leftmostpoint.get(section).getY();
-		if (!donephaseone[section] && claimed[section] == ml && !abortEarly(mosquitoboard, section,(int) ml.getY(),(int) ml.getY())) {
+
+		if (section != -1 && !donephaseone[section] && claimed[section] == ml && !abortEarly(mosquitoboard, section,(int) ml.getY(),(int) ml.getY())) {
+			Point2D destination = ml.getDestination();
+			Point2D location = ml.getLocation();
+			double sectionX = leftmostpoint.get(section).getX();
+			double sectionY = leftmostpoint.get(section).getY();
 			if (location.getX() != sectionX || location.getY() != sectionY) {
 				if (!(destination.getX() == sectionX && destination.getY() == sectionY)) {
 					ArrayList<Point2D.Double> starPath = star.getPath(
@@ -346,6 +372,9 @@ public class Sweeper {
 //				}
 //			}
 //		}
+		if (section == -1) {
+			return true;
+		}
 		
 		
 		List<Section> l = v.getSectionList();

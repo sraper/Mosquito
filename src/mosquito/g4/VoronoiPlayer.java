@@ -3,6 +3,7 @@ package mosquito.g4;
 //import G4Light;
 
 import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -103,21 +104,26 @@ public class VoronoiPlayer extends Player {
 
         int numleftover = numLights - seen.size();
         outerloop:
-        // for (int i = 0; i < v.getNumSections() && lights.size() < numLights;
-        // i++) {
-        // lights.add(new G4Light(s.getStartingPoints().get(i).getX(), s
-        // .getStartingPoints().get(i).getY(), i));
-        // }
+    	for (int i = 0; i < numleftover; i++) {
+			for (int section = 0; section < v.getNumSections(); section++) {
+				if (!seen.contains(section)) {
+					lights.add(new G4Light(s.getStartingPoints().get(section)
+							.getX(), s.getStartingPoints().get(section).getY(),
+							i));
+					seen.add(section);
+					if (seen.size() == numLights) {
+						break outerloop;
+					}
+				}
+			}
+		}
+//         for (int i = 0; i < v.getNumSections() && lights.size() < numLights;
+//         i++) {
+//         lights.add(new G4Light(s.getStartingPoints().get(i).getX(), s
+//         .getStartingPoints().get(i).getY(), i));
+//         }
 
         return lights;
-    }
-
-    private HashSet<Integer> addLight(int section, HashSet<Integer> seen,
-            int count) {
-        lights.add(new G4Light(s.getStartingPoints().get(section).getX(), s
-                .getStartingPoints().get(section).getY(), seen.size()));
-        seen.add(section);
-        return seen;
     }
 
     private HashSet<Integer> addLight(int section, HashSet<Integer> seen) {
@@ -143,13 +149,13 @@ public class VoronoiPlayer extends Player {
             // isAtCollector = true;
             // continue;
             // }
-
             boolean sweeping = s.doSweep(ml,
                     sections.getSection((int) ml.getX(), (int) ml.getY()),
                     board);
             if (!sweeping) {
                 ml.moveLeft();
             }
+            ml.addPoint(new Point2D.Double(ml.getX(), ml.getY()));
         }
         return lights;
     }
