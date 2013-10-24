@@ -192,18 +192,22 @@ public class VoronoiPlayer extends Player {
     	for(int i = 0; i < 50; i++) {
     		if (!intersectsWall(50, 50 + i)) {
     	    	log.trace("1 i: " + i);
+    	    	s.setCollector(new Point2D.Double(50, 50 + i));
     			return new Collector(50, 50 + i);
     		}
     		if (!intersectsWall(50, 50 - i)) {
     	    	log.trace("2 i: " + i);
+    	    	s.setCollector(new Point2D.Double(50, 50 - i));
     			return new Collector(50, 50 - i);
     		}
     		if (!intersectsWall(50 + i, 50)) {
     	    	log.trace("3 i: " + i);
+    	    	s.setCollector(new Point2D.Double(50 + i, 50));
     			return new Collector(50 + i, 50);
     		}
     		if (!intersectsWall(50 - i, 50)) {
     	    	log.trace("4 i: " + i);
+    	    	s.setCollector(new Point2D.Double(50 - i, 50));
     			return new Collector(50 - i, 50);
     		}
     	}

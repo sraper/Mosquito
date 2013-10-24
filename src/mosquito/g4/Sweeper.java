@@ -24,6 +24,8 @@ public class Sweeper {
 	private boolean[] lasttimeup; // for continuing in same dir
 	private int[][] board;
 	private int numsections;
+	
+	private Point2D collectorpos;
 
 	private boolean[] donesweep; // to signal that we're doing one last updown
 									// check
@@ -57,7 +59,7 @@ public class Sweeper {
 
 	// should enumerate but lazy
 	public boolean doSweep(G4Light ml, int section, int[][] mosquitoboard) {
-		if (ml.isStuck() && ml.getX() != 50 && ml.getY() != 50) {
+		if (ml.isStuck() && ml.getX() != collectorpos.getX() && ml.getY() != collectorpos.getY()) {
 			log.trace("what");
 			ml.clearPastPoints();
 			ml.setDispatched(false);
@@ -66,13 +68,15 @@ public class Sweeper {
 				
 				ArrayList<Point2D.Double> starPath = star.getPath(
 						new Point2D.Double(ml.getX(), ml.getY()),
-						new Point2D.Double(50, 50));
+						new Point2D.Double(collectorpos.getX(), collectorpos.getY()));
 				ml.setPath(starPath);
 			}
 			// hmm not sure about this
-			if (section != ml.dispatchedSection) {
-				claimed[ml.dispatchedSection] = null;
-			}
+//			if (section != ml.dispatchedSection) {
+//				claimed[ml.dispatchedSection] = null;
+//			}
+			
+			
 //			ml.setDispatched(false);
 //			ArrayList<Point2D.Double> starPath = star.getPath(
 //					new Point2D.Double(ml.getX(), ml.getY()),
@@ -158,7 +162,7 @@ public class Sweeper {
 					
 					ArrayList<Point2D.Double> starPath = star.getPath(
 							new Point2D.Double(ml.getX(), ml.getY()),
-							new Point2D.Double(50, 50));
+							new Point2D.Double(collectorpos.getX(), collectorpos.getY()));
 					ml.setPath(starPath);
 				}
 				// log.trace("Printing path:");
@@ -436,5 +440,9 @@ public class Sweeper {
 
 	public ArrayList<Point2D> getStartingPoints() {
 		return leftmostpoint;
+	}
+	
+	public void setCollector(Point2D collectorpoint) {
+		this.collectorpos = collectorpoint;
 	}
 }
