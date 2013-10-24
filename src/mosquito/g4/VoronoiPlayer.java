@@ -31,6 +31,7 @@ public class VoronoiPlayer extends Player {
     private AStar star;
 
     private boolean[] issweeping;
+    private Set<Line2D> walls;
 
     public VoronoiPlayer() {
         lights = new HashSet<Light>();
@@ -58,6 +59,8 @@ public class VoronoiPlayer extends Player {
         this.star = new AStar(walls);
         v.doVoronoi();
 
+        this.walls = walls;
+        
         issweeping = new boolean[v.getNumSections()];
         if (numLights == v.getNumSections()) {
             Arrays.fill(issweeping, true);
@@ -186,6 +189,33 @@ public class VoronoiPlayer extends Player {
      */
     @Override
     public Collector getCollector() {
-        return new Collector(50, 50);
+    	for(int i = 0; i < 50; i++) {
+    		if (!intersectsWall(50, 50 + i)) {
+    	    	log.trace("1 i: " + i);
+    			return new Collector(50, 50 + i);
+    		}
+    		if (!intersectsWall(50, 50 - i)) {
+    	    	log.trace("2 i: " + i);
+    			return new Collector(50, 50 - i);
+    		}
+    		if (!intersectsWall(50 + i, 50)) {
+    	    	log.trace("3 i: " + i);
+    			return new Collector(50 + i, 50);
+    		}
+    		if (!intersectsWall(50 - i, 50)) {
+    	    	log.trace("4 i: " + i);
+    			return new Collector(50 - i, 50);
+    		}
+    	}
+    	return new Collector(50, 50);
+    }
+    
+    private boolean intersectsWall(int x, int y) {
+		for(Line2D wall : walls) {
+			if(wall.intersects(x, y, 1, 1)) {
+				return true;
+			}
+		}
+		return false;
     }
 }
