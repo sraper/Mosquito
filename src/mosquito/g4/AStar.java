@@ -81,8 +81,20 @@ public class AStar {
 			if (current.x == end.x && current.y == end.y){
 				ArrayList<Point2D.Double> finalPath = reconstructPath(cameFrom, current);
 				Point2D.Double firstPoint = finalPath.get(0);
+				
 				for (int i=0; i<12; i++)
 					finalPath.add(0, firstPoint);
+				int i = 0;
+				while (i < finalPath.size()){
+					if (i % 30 == 0){
+						Point2D.Double random = finalPath.get(i);
+						for (int j=0;j<5;j++){
+							finalPath.add(i, random);
+						}
+						i+=6;
+					}
+					i++;
+				}
 				return finalPath;
 			}
 			closedSet.add(current);
@@ -94,7 +106,7 @@ public class AStar {
 				for (Point nb2 : getNeighbors(neighbor)){
 					if (!Utils.hasStraightPath(neighbor, nb2, walls))
 						score += 20000;
-			/*		for (Point nb3 : getNeighbors(nb2)){
+					for (Point nb3 : getNeighbors(nb2)){
 						if (!Utils.hasStraightPath(nb2, nb3, walls))
 							score += 2000;
 					/*	for (Point nb4 : getNeighbors(nb3)){
@@ -102,7 +114,7 @@ public class AStar {
 								score += 200;
 							
 						} */
-					//} */
+					} 
 				}
 				int neighbor_cost = current.score + score;
 				if (closedSet.contains(neighbor))
