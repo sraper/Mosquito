@@ -355,7 +355,9 @@ public class Sweeper {
 		}
 		for (int i = 0; i < 100; i++) {
 			for (int j = 0; j < 100; j++) {
-				rightmostpoint.set(board[i][j], new Point(i, j));
+				if (!intersectsWall((int)i, (int)j)) {
+					rightmostpoint.set(board[i][j], new Point(i, j));
+				}
 			}
 		}
 
@@ -447,6 +449,10 @@ public class Sweeper {
 
 	public ArrayList<Point2D> getStartingPoints() {
 		return leftmostpoint;
+	}
+	
+	public ArrayList<Point2D> getEndingPoints() {
+		return rightmostpoint;
 	}
 	
 	public void setCollector(Point2D collectorpoint) {

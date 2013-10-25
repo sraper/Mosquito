@@ -72,7 +72,7 @@ public class VoronoiPlayer extends Player {
         s = new Sweeper(star, v.getNumSections(), sections.getSectionBoard(),
                 sections, v, walls);
 
-        this.pp = new PositionPicker(v, sections, star, numLights, s.getStartingPoints());
+        this.pp = new PositionPicker(v, sections, star, s.getStartingPoints(), s.getEndingPoints());
         
         
         ArrayList<Line2D> bbb = new SectionLineDrawer(v.getSectionIdBoard()).createLines();
@@ -80,6 +80,12 @@ public class VoronoiPlayer extends Player {
         for(Point2D p : start) {
         	bbb.add(new Line2D.Double(p.getX() - 1, p.getY() - 1, p.getX() + 1, p.getY() + 1));
         	bbb.add(new Line2D.Double(p.getX() - 1, p.getY() + 1, p.getX() + 1, p.getY() - 1));
+        }
+        
+        ArrayList<Point2D> end = s.getEndingPoints();
+        for (Point2D p : end) {
+        	bbb.add(new Line2D.Double(p.getX() - 1, p.getY(), p.getX() + 1, p.getY()));
+        	bbb.add(new Line2D.Double(p.getX(), p.getY() + 1, p.getX(), p.getY() - 1));
         }
 //        return new SectionLineDrawer(v.getSectionIdBoard()).createLines();   
         return bbb;
@@ -91,12 +97,14 @@ public class VoronoiPlayer extends Player {
      * board[x][y] tells you the number of mosquitoes at coordinate (x, y)
      */
     public Set<Light> getLights(int[][] board) {
-    	if(true) {
-    		for(int i = 0; i < numLights; i++) {
-    			lights.add(new G4Light(0, 0, 0));
-    		}
-    		return lights;
-    	}
+    	
+    	
+//    	if(true) {
+//    		for(int i = 0; i < numLights; i++) {
+//    			lights.add(new G4Light(0, 0, 0));
+//    		}
+//    		return lights;
+//    	}
         int[][] secboard = sections.getSectionBoard();
         HashSet<Integer> seen = new HashSet<Integer>();
         for (int count = 0; count < 100; count++) {

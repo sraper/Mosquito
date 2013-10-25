@@ -4,6 +4,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
@@ -23,16 +24,16 @@ public class PositionPicker {
 	private Voronoi v;
 	private Sections sections;
 	private AStar star;
-	private int numLights;
 	private ArrayList<Point2D> startingpoints;
+	private ArrayList<Point2D> endingpoints;
 	private HashMap<SectionTuple<Section, Section>, Integer> seen;
 	
-	public PositionPicker(Voronoi v, Sections sections, AStar star, int numLights, ArrayList<Point2D> startingpoints) {
+	public PositionPicker(Voronoi v, Sections sections, AStar star, ArrayList<Point2D> startingpoints, ArrayList<Point2D> endingpoints) {
 		this.v = v;
 		this.sections = sections;
 		this.star = star;
-		this.numLights = numLights;
 		this.startingpoints = startingpoints;
+		this.endingpoints = endingpoints;
 		this.seen = new HashMap<SectionTuple<Section, Section>, Integer>();
 	}
 	
@@ -57,11 +58,18 @@ public class PositionPicker {
 				min = e.getValue();
 			}
 		}
-		return startingpoints.get(collectorsection.getId());
+		
+		Point2D p = endingpoints.get(collectorsection.getId());
+		return p;
 	}
 	
 	// find best light positions
-	public Set<Light> getLightPosition() {
+	public Set<Light> getLightPosition(int numLights) {
+		Set<Light> lights = new HashSet<Light>();
+		for(int i = 0; i < numLights; i++) {
+			
+		}
+		
 		
 		return null;
 	}
