@@ -33,6 +33,8 @@ public class VoronoiPlayer extends Player {
     private boolean[] issweeping;
     private Set<Line2D> walls;
 
+    private PositionPicker pp;
+    
     public VoronoiPlayer() {
         lights = new HashSet<Light>();
     }
@@ -68,9 +70,19 @@ public class VoronoiPlayer extends Player {
 
         sections = v.getSections();
         s = new Sweeper(star, v.getNumSections(), sections.getSectionBoard(),
-                sections, v);
+                sections, v, walls);
 
-        return new SectionLineDrawer(v.getSectionIdBoard()).createLines();
+        this.pp = new PositionPicker(v, sections, star, numLights, s.getStartingPoints());
+        
+        
+        ArrayList<Line2D> bbb = new SectionLineDrawer(v.getSectionIdBoard()).createLines();
+        ArrayList<Point2D> start = s.getStartingPoints();
+        for(Point2D p : start) {
+        	bbb.add(new Line2D.Double(p.getX() - 1, p.getY() - 1, p.getX() + 1, p.getY() + 1));
+        	bbb.add(new Line2D.Double(p.getX() - 1, p.getY() + 1, p.getX() + 1, p.getY() - 1));
+        }
+//        return new SectionLineDrawer(v.getSectionIdBoard()).createLines();   
+        return bbb;
     }
 
     /*
@@ -79,6 +91,12 @@ public class VoronoiPlayer extends Player {
      * board[x][y] tells you the number of mosquitoes at coordinate (x, y)
      */
     public Set<Light> getLights(int[][] board) {
+    	if(true) {
+    		for(int i = 0; i < numLights; i++) {
+    			lights.add(new G4Light(0, 0, 0));
+    		}
+    		return lights;
+    	}
         int[][] secboard = sections.getSectionBoard();
         HashSet<Integer> seen = new HashSet<Integer>();
         for (int count = 0; count < 100; count++) {
@@ -189,29 +207,36 @@ public class VoronoiPlayer extends Player {
      */
     @Override
     public Collector getCollector() {
-    	for(int i = 0; i < 50; i++) {
-    		if (!intersectsWall(50, 50 + i)) {
-    	    	log.trace("1 i: " + i);
-    	    	s.setCollector(new Point2D.Double(50, 50 + i));
-    			return new Collector(50, 50 + i);
-    		}
-    		if (!intersectsWall(50, 50 - i)) {
-    	    	log.trace("2 i: " + i);
-    	    	s.setCollector(new Point2D.Double(50, 50 - i));
-    			return new Collector(50, 50 - i);
-    		}
-    		if (!intersectsWall(50 + i, 50)) {
-    	    	log.trace("3 i: " + i);
-    	    	s.setCollector(new Point2D.Double(50 + i, 50));
-    			return new Collector(50 + i, 50);
-    		}
-    		if (!intersectsWall(50 - i, 50)) {
-    	    	log.trace("4 i: " + i);
-    	    	s.setCollector(new Point2D.Double(50 - i, 50));
-    			return new Collector(50 - i, 50);
-    		}
-    	}
-    	return new Collector(50, 50);
+    	log.trace(s.getStartingPoints().toString());
+    	Point2D collect = pp.getCollectorPosition();
+    	log.trace(collect.toString());
+    	
+    	s.setCollector(collect);
+    	return new Collector(collect.getX(), collect.getY());
+
+//    	for(int i = 0; i < 50; i++) {
+//    		if (!intersectsWall(50, 50 + i)) {
+//    	    	log.trace("1 i: " + i);
+//    	    	s.setCollector(new Point2D.Double(50, 50 + i));
+//    			return new Collector(50, 50 + i);
+//    		}
+//    		if (!intersectsWall(50, 50 - i)) {
+//    	    	log.trace("2 i: " + i);
+//    	    	s.setCollector(new Point2D.Double(50, 50 - i));
+//    			return new Collector(50, 50 - i);
+//    		}
+//    		if (!intersectsWall(50 + i, 50)) {
+//    	    	log.trace("3 i: " + i);
+//    	    	s.setCollector(new Point2D.Double(50 + i, 50));
+//    			return new Collector(50 + i, 50);
+//    		}
+//    		if (!intersectsWall(50 - i, 50)) {
+//    	    	log.trace("4 i: " + i);
+//    	    	s.setCollector(new Point2D.Double(50 - i, 50));
+//    			return new Collector(50 - i, 50);
+//    		}
+//    	}
+//    	return new Collector(50, 50);
     }
     
     private boolean intersectsWall(int x, int y) {

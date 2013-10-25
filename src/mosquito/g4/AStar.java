@@ -68,7 +68,7 @@ public class AStar {
 	}
 
 	
-	public ArrayList<Point2D.Double> getPath(Point2D.Double start, Point2D.Double end){
+	public ArrayList<Point2D.Double> getPath(Point2D start, Point2D end){
 		HashSet<Point2D.Double> closedSet = new HashSet<Point2D.Double>(); 
 		PriorityQueue<Point> openSet = new PriorityQueue<Point>();
 		HashMap<Point, Point>cameFrom = new HashMap<Point, Point>(); 
@@ -78,7 +78,7 @@ public class AStar {
 		min.score = 0;
 		while (!openSet.isEmpty()){
 			Point current = openSet.poll();
-			if (current.x == end.x && current.y == end.y){
+			if (current.x == end.getX() && current.y == end.getY()){
 				ArrayList<Point2D.Double> finalPath = reconstructPath(cameFrom, current);
 				Point2D.Double firstPoint = finalPath.get(0);
 				

@@ -226,7 +226,7 @@ public class Voronoi {
                     + " at point " + point);
             calculateDistance(point, i);
             ++i;
-            printSectionBoard();
+//            printSectionBoard();
         }
 
         this.setNumSections(i);

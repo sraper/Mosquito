@@ -12,7 +12,9 @@ public class Sections {
     }
 
     public PriorityQueue<Section> getSections() {
-        return sections;
+    	PriorityQueue<Section> pq = new PriorityQueue<Section>();
+    	pq.addAll(sections);
+        return pq;
     }
 
     void addSection(Section section) {

@@ -2,10 +2,12 @@ package mosquito.g4;
 
 import java.util.List;
 import java.awt.Point;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.PriorityQueue;
+import java.util.Set;
 
 import mosquito.g4.utils.Utils;
 import mosquito.g4.voronoi.Section;
@@ -25,6 +27,8 @@ public class Sweeper {
 	private int[][] board;
 	private int numsections;
 	
+    private Set<Line2D> walls;
+	
 	private Point2D collectorpos;
 
 	private boolean[] donesweep; // to signal that we're doing one last updown
@@ -36,13 +40,15 @@ public class Sweeper {
 
 	private G4Light[] claimed;
 	private ArrayList<Point2D> leftmostpoint;
+
 	private ArrayList<Point2D> rightmostpoint;
 	private AStar star;
 	private Sections s;
 	private Voronoi v;
 
-	public Sweeper(AStar star, int numsections, int[][] board, Sections sections, Voronoi v) {
+	public Sweeper(AStar star, int numsections, int[][] board, Sections sections, Voronoi v, Set<Line2D> walls) {
 		this.v = v;
+		this.walls = walls;
 		s = sections;
 		counter = new int[numsections];
 		lasttimeup = new boolean[numsections];
@@ -97,6 +103,7 @@ public class Sweeper {
 			}
 		}
 		if (done && !ml.isDispatched()) {
+			return true;
 //			return ml.hunt();
 		}
 		if (ml.isDispatched())
@@ -317,13 +324,13 @@ public class Sweeper {
 			double myx = leftmostpoint.get(thissection).getX();
 			double myy = leftmostpoint.get(thissection).getY();
 			boolean foundbetter = false;
-			for (int i = -12; i < CONFIDENCE_AREA; i++) {
-				for (int j = 0; j < CONFIDENCE_AREA; j++) {
+			for (int i = 0; i < CONFIDENCE_AREA; i++) {
+				for (int j = -12; j < CONFIDENCE_AREA; j++) {
 					if (myx + i < 100
 							&& myy + j < 100
 							&& myx + i > 0
 							&& myy + j > 0
-							&& board[(int) (myx + i)][(int) (myy + j)] == thissection) {
+							&& board[(int) (myx + i)][(int) (myy + j)] == thissection && !intersectsWall ((int)myx + i, (int)myy + j)) {
 						if ((myx + i <= 88 && myx + i >= 12)
 								&& (myy + j <= 88 && myy + j >= 12)) {
 							leftmostpoint.set(thissection, new Point(
@@ -445,4 +452,13 @@ public class Sweeper {
 	public void setCollector(Point2D collectorpoint) {
 		this.collectorpos = collectorpoint;
 	}
+	
+	private boolean intersectsWall(int x, int y) {
+		for(Line2D wall : walls) {
+			if(wall.intersects(x, y, 1, 1)) {
+				return true;
+			}
+		}
+		return false;
+    }
 }
