@@ -165,10 +165,10 @@ public class AStar {
 					score = maxout(score, Integer.MAX_VALUE);
 				for (Point nb2 : getNeighbors(neighbor)){
 					if (!Utils.hasStraightPath(neighbor, nb2, walls))
-						score = maxout(score, Integer.MAX_VALUE/2);
-					/*for (Point nb3 : getNeighbors(nb2)){
+						score = maxout(score, 10000);
+		/*			for (Point nb3 : getNeighbors(nb2)){
 						if (!Utils.hasStraightPath(nb3, nb2, walls))
-							score = maxout(score, 1000000);
+							score = maxout(score, 1000);
 						for (Point nb4 : getNeighbors(nb3)){
 							if (!Utils.hasStraightPath(nb3, nb4, walls))
 								score = maxout(score, 100000);	
