@@ -54,7 +54,7 @@ public final class GeometryUtils {
      *            Second number to check
      * @return True if the twho numbers are "equal", false otherwise
      */
-    private static boolean equals(double a, double b) {
+    public static boolean equals(double a, double b) {
         return equals(a, b, 1.0e-5);
     }
 

@@ -45,14 +45,14 @@ public class G4Light extends MoveableLight {
     }
 
     public void printPath() {
-        log.trace("Starts at : ");
-        log.trace("x : " + this.getX() + " y : " + this.getY());
+  //      log.trace("Starts at : ");
+   //     log.trace("x : " + this.getX() + " y : " + this.getY());
         double prevx = this.getX();
         double prevy = this.getY();
         for (Point2D.Double p : path) {
-            if (Math.sqrt(Math.pow(p.x - prevx, 2) + Math.pow(p.y - prevy, 2)) > 1.0)
-                log.trace("WARNING, DISTANCE GREATER THAN 1");
-            log.trace("x : " + p.x + " y : " + p.y);
+    //        if (Math.sqrt(Math.pow(p.x - prevx, 2) + Math.pow(p.y - prevy, 2)) > 1.0)
+ //               log.trace("WARNING, DISTANCE GREATER THAN 1");
+  //          log.trace("x : " + p.x + " y : " + p.y);
             prevx = p.x;
             prevy = p.y;
         }
@@ -108,7 +108,7 @@ public class G4Light extends MoveableLight {
     }
 
     public boolean isStuck() {
-        log.trace(pastPoints.toString());
+    //    log.trace(pastPoints.toString());
         if (pastPoints.size() <= 50)
             return false;
 

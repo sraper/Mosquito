@@ -26,16 +26,16 @@ public class Sweeper {
 	private boolean[] lasttimeup; // for continuing in same dir
 	private int[][] board;
 	private int numsections;
-	
-    private Set<Line2D> walls;
-	
+
+	private Set<Line2D> walls;
+
 	private Point2D collectorpos;
 
 	private boolean[] donesweep; // to signal that we're doing one last updown
-									// check
+	// check
 	private boolean[] donephaseone; // to signal that we've arrived at the
-									// starting point
-	
+	// starting point
+
 	private boolean[] isondiagonal;
 
 	private G4Light[] claimed;
@@ -66,45 +66,33 @@ public class Sweeper {
 	// should enumerate but lazy
 	public boolean doSweep(G4Light ml, int section, int[][] mosquitoboard) {
 		if (ml.isStuck() && ml.getX() != collectorpos.getX() && ml.getY() != collectorpos.getY()) {
-			log.trace("what");
+	//		log.trace("what");
 			ml.clearPastPoints();
 			ml.setDispatched(false);
 			section = findUnclaimedSection(ml);
 			if (section == -1) {
-				
+
 				ArrayList<Point2D.Double> starPath = star.getPath(
 						new Point2D.Double(ml.getX(), ml.getY()),
 						new Point2D.Double(collectorpos.getX(), collectorpos.getY()));
 				ml.setPath(starPath);
 			}
-			// hmm not sure about this
-//			if (section != ml.dispatchedSection) {
-//				claimed[ml.dispatchedSection] = null;
-//			}
-			
-			
-//			ml.setDispatched(false);
-//			ArrayList<Point2D.Double> starPath = star.getPath(
-//					new Point2D.Double(ml.getX(), ml.getY()),
-//					new Point2D.Double(50, 50));
-//			ml.setPath(starPath);
-//			section = -1;
 		}
-		
-		
-		log.trace(Utils.toString(claimed));
+
+
+		//	log.trace(Utils.toString(claimed));
 		boolean done = ml.hasDestination && ml.destinationReached();
 		if (section != -1 && claimed[section] == null) {
 			claimed[section] = ml;
 			if (ml.isDispatched()) {
-			log.trace("claiming " + section + " unclaiming " + ml.dispatchedSection);
-			if (ml.dispatchedSection != -1) claimed[ml.dispatchedSection] = null;
-			ml.dispatchedSection = section;
+				//		log.trace("claiming " + section + " unclaiming " + ml.dispatchedSection);
+				if (ml.dispatchedSection != -1) claimed[ml.dispatchedSection] = null;
+				ml.dispatchedSection = section;
 			}
 		}
 		if (done && !ml.isDispatched()) {
 			return true;
-//			return ml.hunt();
+			//			return ml.hunt();
 		}
 		if (ml.isDispatched())
 			section = ml.dispatchedSection;
@@ -166,7 +154,7 @@ public class Sweeper {
 				ml.setDispatched(false);
 				section = findUnclaimedSection(ml);
 				if (section == -1) {
-					
+
 					ArrayList<Point2D.Double> starPath = star.getPath(
 							new Point2D.Double(ml.getX(), ml.getY()),
 							new Point2D.Double(collectorpos.getX(), collectorpos.getY()));
@@ -212,9 +200,9 @@ public class Sweeper {
 		if (abortEarly(mboard, section, x, y)) {
 			return -2;
 		}
-		
-		
-		
+
+
+
 		if (section >= numsections) {
 			return -1;
 		}
@@ -237,22 +225,22 @@ public class Sweeper {
 			return -2;
 			// sweeping in upward or downward direction
 		} else if (counter[section] % 12 == 0 && move != -1) {
-	//		isondiagonal[section] = true;
+			//		isondiagonal[section] = true;
 			return move;
 			// moving right
 		} else {
-	//		isondiagonal[section] = true;
+			//		isondiagonal[section] = true;
 			// end of board gtfo, don't think it ever goes here anymore?
 			if (x + 2 == 100) {
 				return -1;
 				// on a diagonal
 			} else if (x + 2 < 100 && board[x + 2][y] != section) {
-				log.trace("lasttimeup[" + section + "]: " + lasttimeup[section]);
+				//			log.trace("lasttimeup[" + section + "]: " + lasttimeup[section]);
 				StringBuilder sb = new StringBuilder();
 				for (int i = 0; i < lasttimeup.length; i++) {
 					sb.append(lasttimeup[i] + ", ");
 				}
-				log.trace(sb);
+				//		log.trace(sb);
 				move = goUpDown(section, x, y, true);
 				if (move == -1) {
 					lasttimeup[section] = !lasttimeup[section];
@@ -272,9 +260,9 @@ public class Sweeper {
 
 	private int goUpDown(int section, int x, int y, boolean isondiag) {
 		int padding = isondiag ? 2 : 12;
-//		if (isondiagonal) {
-//			padding = 2;
-//		}
+		//		if (isondiagonal) {
+		//			padding = 2;
+		//		}
 		// if we were going up last time try to keep going that way
 		if (lasttimeup[section]) {
 			if (y - padding > 0 && board[x][y - padding] == section) {
@@ -284,9 +272,9 @@ public class Sweeper {
 				// reached a perimeter, signal that we need to start heading
 				// right now
 			} else {
-		//		if (!isondiagonal[section]) {
-		//			lasttimeup[section] = false;
-		//		}
+				//		if (!isondiagonal[section]) {
+				//			lasttimeup[section] = false;
+				//		}
 				return -1;
 			}
 		} else {
@@ -295,9 +283,9 @@ public class Sweeper {
 				// + section);
 				return 3; // south
 			} else {
-		//		if (!isondiagonal[section]) {
-		//			lasttimeup[section] = true;
-		//		}
+				//		if (!isondiagonal[section]) {
+				//			lasttimeup[section] = true;
+				//		}
 				return -1;
 			}
 		}
@@ -371,25 +359,25 @@ public class Sweeper {
 		 * }}
 		 * return true;
 		 */
-//		HashSet<Integer> seen = new HashSet<Integer>();
-//		PriorityQueue<Section> pq = s.getSections();
-//		while(!pq.isEmpty()) {
-//			Section mysec = pq.poll();
-//			List<Point2D> secpoints = mysec.getPoints();
-//			for (Point2D p : secpoints) {
-//				double px = p.getX();
-//				double py = p.getY();
-//				
-//				if(mboard[px][py] > 0 && !lightwithin(5)) {
-//					
-//				}
-//			}
-//		}
+		//		HashSet<Integer> seen = new HashSet<Integer>();
+		//		PriorityQueue<Section> pq = s.getSections();
+		//		while(!pq.isEmpty()) {
+		//			Section mysec = pq.poll();
+		//			List<Point2D> secpoints = mysec.getPoints();
+		//			for (Point2D p : secpoints) {
+		//				double px = p.getX();
+		//				double py = p.getY();
+		//				
+		//				if(mboard[px][py] > 0 && !lightwithin(5)) {
+		//					
+		//				}
+		//			}
+		//		}
 		if (section == -1) {
 			return true;
 		}
-		
-		
+
+
 		List<Section> l = v.getSectionList();
 		Section thissec = null;
 		for (Section s : l) {
@@ -406,34 +394,34 @@ public class Sweeper {
 				return false;
 			}
 		}
-//		for (int i = 0; i < 100; i++) {
-//			for (int j = 0; j < 100; j++) {
-//				if (board[i][j] == section && mboard[i][j] > 0 && distance(x, y, i, j) > 5) {
-//					return false;
-//				}
-//			}
-//		}
+		//		for (int i = 0; i < 100; i++) {
+		//			for (int j = 0; j < 100; j++) {
+		//				if (board[i][j] == section && mboard[i][j] > 0 && distance(x, y, i, j) > 5) {
+		//					return false;
+		//				}
+		//			}
+		//		}
 		return true;
 	}
-	
-//	private boolean lightwithin(int radius) {
-//		for(int i = -5; i < radius; i++) {
-//			for (int j = -5; j < radius; j++) {
-//				if(i >= 0 &&)
-//			}
-//		}
-//	}
-	
+
+	//	private boolean lightwithin(int radius) {
+	//		for(int i = -5; i < radius; i++) {
+	//			for (int j = -5; j < radius; j++) {
+	//				if(i >= 0 &&)
+	//			}
+	//		}
+	//	}
+
 	private double distance(int x1, int y1, int x2, int y2) {
 		int delx = Math.abs(x2 - x1);
 		int dely = Math.abs(y2 - y1);
-		
+
 		return Math.pow( (delx*delx) + (dely*dely), .5);
 	}
-	
-	
+
+
 	public boolean moveToPoint(G4Light inlight, double x, double y) {
-		log.trace(inlight.getX() + " " + inlight.getY() + " " + x + " " + y);
+		//	log.trace(inlight.getX() + " " + inlight.getY() + " " + x + " " + y);
 		Point2D current = new Point2D.Double(inlight.getX(), inlight.getY());
 		Point2D dest = new Point2D.Double(x, y);
 
@@ -441,8 +429,8 @@ public class Sweeper {
 
 		inlight.moveTo(step.getX(), step.getY());
 
-		log.trace(String.format("src %s dest %s step %s", current.toString(),
-				dest.toString(), step.toString()));
+		//	log.trace(String.format("src %s dest %s step %s", current.toString(),
+		//			dest.toString(), step.toString()));
 
 		return (step.distance(dest) == 0);
 	}
@@ -450,15 +438,15 @@ public class Sweeper {
 	public ArrayList<Point2D> getStartingPoints() {
 		return leftmostpoint;
 	}
-	
+
 	public ArrayList<Point2D> getEndingPoints() {
 		return rightmostpoint;
 	}
-	
+
 	public void setCollector(Point2D collectorpoint) {
 		this.collectorpos = collectorpoint;
 	}
-	
+
 	private boolean intersectsWall(int x, int y) {
 		for(Line2D wall : walls) {
 			if(wall.intersects(x, y, 1, 1)) {
@@ -466,5 +454,5 @@ public class Sweeper {
 			}
 		}
 		return false;
-    }
+	}
 }

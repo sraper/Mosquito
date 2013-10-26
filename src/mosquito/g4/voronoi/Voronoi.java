@@ -339,23 +339,6 @@ public class Voronoi {
         setNumSections(getNumSections() + 1);
     }
 
-    private void makeConvex() {
-        for (int x = 1; x < sectionIdBoard.length; x++) {
-            for (int y = 0; y < sectionIdBoard[0].length; y++) {
-                int newX = x + 2;
-                int newY = y - 1;
-                int section = sectionIdBoard[x][y];
-
-                if (Utils.withinBounds(0, sectionIdBoard.length, newX)
-                        && Utils.withinBounds(0, sectionIdBoard[0].length, newY)) {
-                    if (sectionIdBoard[newX][newY] == section) {
-                        sectionIdBoard[x + 1][y] = section;
-                    }
-                }
-            }
-        }
-    }
-
     public int[][] getSectionIdBoard() {
         return this.sectionIdBoard;
     }

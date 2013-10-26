@@ -215,9 +215,9 @@ public class VoronoiPlayer extends Player {
      */
     @Override
     public Collector getCollector() {
-    	log.trace(s.getStartingPoints().toString());
+    //	log.trace(s.getStartingPoints().toString());
     	Point2D collect = pp.getCollectorPosition();
-    	log.trace(collect.toString());
+    //	log.trace(collect.toString());
     	
     	s.setCollector(collect);
     	return new Collector(collect.getX(), collect.getY());

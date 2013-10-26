@@ -8,15 +8,66 @@ import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Set;
 
+import mosquito.g4.utils.GeometryUtils;
 import mosquito.g4.utils.Utils;
+
+import org.apache.log4j.Logger;
 
 public class AStar {
 
 
 	private int[][] wallMap;
 	private Set<Line2D> walls;
+	private static final Logger log = Logger.getLogger(VoronoiPlayer.class); // for
 
+	private double pointExtend(double m){
+		int c = 2;
+		return Math.sqrt(Math.pow(c, 2)/(1+Math.pow(m,2)));
+	}
+	
+	private Line2D extendWall(Line2D wall){
+		double x1 = wall.getX1();
+		double x2 = wall.getX2();
+		double y1 = wall.getY1();
+		double y2 = wall.getY2();
+		int c = 1;
+		log.trace("Before : " + wall.getP1() + " " + wall.getP2());
+		if (GeometryUtils.equals(x1, x2)){
+			if (y1 < y2)
+				wall.setLine(new Point2D.Double(x1,y1-c), new Point2D.Double(x2,y2+c));
+			else
+				wall.setLine(new Point2D.Double(x1,y1+c), new Point2D.Double(x2,y2-c));
+			log.trace("After : " + wall.getP1() + " " + wall.getP2());
+			return wall;
+		}
+		if (GeometryUtils.equals(y1, y2)){
+			if (x1 < x2)
+				wall.setLine(new Point2D.Double(x1-c,y1), new Point2D.Double(x2+c,y2));
+			else
+				wall.setLine(new Point2D.Double(x1+c,y1), new Point2D.Double(x2-c,y2));
+			log.trace("After : " + wall.getP1() + " " + wall.getP2());
+			return wall;
+		}
+	
+		double m = (y2-y1)/(x2-x1);
+		log.trace("Before : " + wall.getP1() + " " + wall.getP2());
+		if (x1 < x2 && y1 < y2)
+			wall.setLine(new Point2D.Double(x1-pointExtend(m), y1-pointExtend(m)*m), new Point2D.Double(x2+pointExtend(m), y2+pointExtend(m)*m));
+		else if (x1 > x2 && y1 < y2)
+			wall.setLine(new Point2D.Double(x1+pointExtend(m), y1-pointExtend(m)*m), new Point2D.Double(x2-pointExtend(m), y2+pointExtend(m)*m));
+		else if (x1 < x2 && y1 > y2)
+			wall.setLine(new Point2D.Double(x1-pointExtend(m), y1+pointExtend(m)*m), new Point2D.Double(x2+pointExtend(m), y2-pointExtend(m)*m));
+		else // if (x1 > x2 && y1 > y2)
+			wall.setLine(new Point2D.Double(x1+pointExtend(m), y1+pointExtend(m)*m), new Point2D.Double(x2-pointExtend(m), y2-pointExtend(m)*m));
+		
+		log.trace("After : " + wall.getP1() + " " + wall.getP2());
+		return wall; 
+	}
+	
 	public AStar(Set<Line2D> walls){
+		for (Line2D wall : walls){
+			wall = extendWall(wall);
+		}
 		this.walls = walls; 
 	
 	}
@@ -109,11 +160,6 @@ public class AStar {
 					for (Point nb3 : getNeighbors(nb2)){
 						if (!Utils.hasStraightPath(nb2, nb3, walls))
 							score += 2000;
-					/*	for (Point nb4 : getNeighbors(nb3)){
-							if (!Utils.hasStraightPath(nb3, nb4, walls))
-								score += 200;
-							
-						} */
 					} 
 				}
 				int neighbor_cost = current.score + score;
