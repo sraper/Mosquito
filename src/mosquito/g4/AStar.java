@@ -66,7 +66,7 @@ public class AStar {
 	
 	public AStar(Set<Line2D> walls){
 		for (Line2D wall : walls){
-			wall = extendWall(wall);
+	//	wall = extendWall(wall);
 		}
 		this.walls = walls; 
 	
@@ -118,6 +118,12 @@ public class AStar {
 
 	}
 
+	public int maxout(int score, int x){
+		if (score + x > 0 && score + x < Integer.MAX_VALUE)
+			return score+x;
+		else
+			return Integer.MAX_VALUE;
+	}
 	
 	public ArrayList<Point2D.Double> getPath(Point2D start, Point2D end){
 		HashSet<Point2D.Double> closedSet = new HashSet<Point2D.Double>(); 
@@ -153,16 +159,12 @@ public class AStar {
 			for (Point neighbor : neighbors){
 				int score = 1;
 				if (!Utils.hasStraightPath(current, neighbor, walls))
-					score += 50000;
+					score = maxout(score, Integer.MAX_VALUE);
 				for (Point nb2 : getNeighbors(neighbor)){
 					if (!Utils.hasStraightPath(neighbor, nb2, walls))
-						score += 20000;
-					for (Point nb3 : getNeighbors(nb2)){
-						if (!Utils.hasStraightPath(nb2, nb3, walls))
-							score += 2000;
-					} 
+						score = maxout(score, 100000);
 				}
-				int neighbor_cost = current.score + score;
+				int neighbor_cost = maxout(current.score, score);
 				if (closedSet.contains(neighbor))
 					continue;
 				if (!openSet.contains(neighbor) || neighbor_cost < neighbor.score) {

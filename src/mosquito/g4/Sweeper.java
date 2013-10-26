@@ -92,7 +92,7 @@ public class Sweeper {
 		}
 		if (done && !ml.isDispatched()) {
 			return true;
-			//			return ml.hunt();
+	//		ml.setPath(star.getPath(ml.getLocation(), new Point2D.Double(99,99)));
 		}
 		if (ml.isDispatched())
 			section = ml.dispatchedSection;
