@@ -71,6 +71,10 @@ public class AStar {
 		this.walls = walls; 
 	
 	}
+	
+	public Set<Line2D> getWalls(){
+		return walls;
+	}
 
 	private ArrayList<Point> getNeighbors(Point2D.Double point){
 		ArrayList<Point> neighbors = new ArrayList<Point>();
@@ -163,6 +167,10 @@ public class AStar {
 				for (Point nb2 : getNeighbors(neighbor)){
 					if (!Utils.hasStraightPath(neighbor, nb2, walls))
 						score = maxout(score, 100000);
+					for (Point nb3 : getNeighbors(nb2)){
+						if (!Utils.hasStraightPath(nb3, nb2, walls))
+							score = maxout(score, 10000);
+					}
 				}
 				int neighbor_cost = maxout(current.score, score);
 				if (closedSet.contains(neighbor))

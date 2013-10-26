@@ -72,7 +72,7 @@ public class VoronoiPlayer extends Player {
         s = new Sweeper(star, v.getNumSections(), sections.getSectionBoard(),
                 sections, v, walls);
 
-        this.pp = new PositionPicker(v, sections, star, s.getStartingPoints(), s.getEndingPoints());
+        this.pp = new PositionPicker(v, sections, new AStar(walls), s.getStartingPoints(), s.getEndingPoints());
         
         
         ArrayList<Line2D> bbb = new SectionLineDrawer(v.getSectionIdBoard()).createLines();

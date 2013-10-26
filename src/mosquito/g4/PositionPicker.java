@@ -1,5 +1,6 @@
 package mosquito.g4;
 
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
 import java.util.ArrayList;
@@ -60,8 +61,42 @@ public class PositionPicker {
 		}
 		
 		Point2D p = endingpoints.get(collectorsection.getId());
+		
+		  for(int i = 0; i < 50; i++) {
+	          if (!intersectsWall(p.getX(), p.getY() + i)) {
+	              log.trace("1 i: " + i);
+	            return new Point2D.Double(p.getX(), p.getY()+i);
+	          }
+	          if (!intersectsWall(p.getX(), p.getY()-i)) {
+	              log.trace("2 i: " + i);
+	              return new Point2D.Double(p.getX(), p.getY()-i);
+	          }
+	          if (!intersectsWall(p.getX()+i, p.getY())) {
+	              log.trace("3 i: " + i);
+	              return new Point2D.Double(p.getX()+i, p.getY());
+	          }
+	          if (!intersectsWall(p.getX()-i, p.getY())) {
+	              log.trace("4 i: " + i);
+	              return new Point2D.Double(p.getX()-i, p.getY());
+	          }
+	      }
+		
 		return p;
 	}
+	
+	
+
+		      
+		      private boolean intersectsWall(double x, double y) {
+		    	  x = (int)x;
+		    	  y = (int)y;
+		      for(Line2D wall : star.getWalls()) {
+		        if(wall.intersects(x, y, 1, 1)) {
+		          return true;
+		        }
+		      }
+		      return false;
+		       } 
 	
 	// find best light positions
 	public Set<Light> getLightPosition(int numLights) {
