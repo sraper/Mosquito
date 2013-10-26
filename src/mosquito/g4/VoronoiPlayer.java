@@ -29,6 +29,7 @@ public class VoronoiPlayer extends Player {
     private Sweeper s;
     private Sections sections;
     private AStar star;
+    private Point2D collectorpos;
 
     private boolean[] issweeping;
     private Set<Line2D> walls;
@@ -109,6 +110,11 @@ public class VoronoiPlayer extends Player {
         // }
         // return lights;
         // }
+    	if (true) {
+    		collectorpos = pp.getCollectorPosition();
+    		lights = pp.getLightPosition(numLights, collectorpos);
+    		return lights;
+    	}
         int[][] secboard = sections.getSectionBoard();
         HashSet<Integer> seen = new HashSet<Integer>();
         for (int count = 0; count < 100; count++) {
@@ -225,6 +231,15 @@ public class VoronoiPlayer extends Player {
         // s.setCollector(collect);
         // return new Collector(collect.getX(), collect.getY());
 
+    	if (true) {
+        	log.trace(s.getStartingPoints().toString());
+        	 //   	Point2D collect = pp.getCollectorPosition();
+        	 //   	log.trace(collect.toString());
+        	    	
+	    	s.setCollector(collectorpos);
+	    	return new Collector(collectorpos.getX(), collectorpos.getY());
+    	}
+    	
         for (int i = 0; i < 50; i++) {
             if (!intersectsWall(50, 50 + i)) {
                 log.trace("1 i: " + i);
