@@ -34,7 +34,7 @@ public class VoronoiPlayer extends Player {
     private Set<Line2D> walls;
 
     private PositionPicker pp;
-    
+
     public VoronoiPlayer() {
         lights = new HashSet<Light>();
     }
@@ -62,7 +62,7 @@ public class VoronoiPlayer extends Player {
         v.doVoronoi();
 
         this.walls = walls;
-        
+
         issweeping = new boolean[v.getNumSections()];
         if (numLights == v.getNumSections()) {
             Arrays.fill(issweeping, true);
@@ -72,22 +72,27 @@ public class VoronoiPlayer extends Player {
         s = new Sweeper(star, v.getNumSections(), sections.getSectionBoard(),
                 sections, v, walls);
 
-        this.pp = new PositionPicker(v, sections, new AStar(walls), s.getStartingPoints(), s.getEndingPoints());
-        
-        
-        ArrayList<Line2D> bbb = new SectionLineDrawer(v.getSectionIdBoard()).createLines();
+        this.pp = new PositionPicker(v, sections, new AStar(walls),
+                s.getStartingPoints(), s.getEndingPoints());
+
+        ArrayList<Line2D> bbb = new SectionLineDrawer(v.getSectionIdBoard())
+                .createLines();
         ArrayList<Point2D> start = s.getStartingPoints();
-        for(Point2D p : start) {
-        	bbb.add(new Line2D.Double(p.getX() - 1, p.getY() - 1, p.getX() + 1, p.getY() + 1));
-        	bbb.add(new Line2D.Double(p.getX() - 1, p.getY() + 1, p.getX() + 1, p.getY() - 1));
+        for (Point2D p : start) {
+            bbb.add(new Line2D.Double(p.getX() - 1, p.getY() - 1, p.getX() + 1,
+                    p.getY() + 1));
+            bbb.add(new Line2D.Double(p.getX() - 1, p.getY() + 1, p.getX() + 1,
+                    p.getY() - 1));
         }
-        
+
         ArrayList<Point2D> end = s.getEndingPoints();
         for (Point2D p : end) {
-        	bbb.add(new Line2D.Double(p.getX() - 1, p.getY(), p.getX() + 1, p.getY()));
-        	bbb.add(new Line2D.Double(p.getX(), p.getY() + 1, p.getX(), p.getY() - 1));
+            bbb.add(new Line2D.Double(p.getX() - 1, p.getY(), p.getX() + 1, p
+                    .getY()));
+            bbb.add(new Line2D.Double(p.getX(), p.getY() + 1, p.getX(), p
+                    .getY() - 1));
         }
-//        return new SectionLineDrawer(v.getSectionIdBoard()).createLines();   
+        // return new SectionLineDrawer(v.getSectionIdBoard()).createLines();
         return bbb;
     }
 
@@ -97,14 +102,13 @@ public class VoronoiPlayer extends Player {
      * board[x][y] tells you the number of mosquitoes at coordinate (x, y)
      */
     public Set<Light> getLights(int[][] board) {
-    	
-    	
-//    	if(true) {
-//    		for(int i = 0; i < numLights; i++) {
-//    			lights.add(new G4Light(0, 0, 0));
-//    		}
-//    		return lights;
-//    	}
+
+        // if(true) {
+        // for(int i = 0; i < numLights; i++) {
+        // lights.add(new G4Light(0, 0, 0));
+        // }
+        // return lights;
+        // }
         int[][] secboard = sections.getSectionBoard();
         HashSet<Integer> seen = new HashSet<Integer>();
         for (int count = 0; count < 100; count++) {
@@ -132,25 +136,24 @@ public class VoronoiPlayer extends Player {
         }
 
         int numleftover = numLights - seen.size();
-        outerloop:
-    	for (int i = 0; i < numleftover; i++) {
-			for (int section = 0; section < v.getNumSections(); section++) {
-				if (!seen.contains(section)) {
-					lights.add(new G4Light(s.getStartingPoints().get(section)
-							.getX(), s.getStartingPoints().get(section).getY(),
-							i));
-					seen.add(section);
-					if (seen.size() == numLights) {
-						break outerloop;
-					}
-				}
-			}
-		}
-//         for (int i = 0; i < v.getNumSections() && lights.size() < numLights;
-//         i++) {
-//         lights.add(new G4Light(s.getStartingPoints().get(i).getX(), s
-//         .getStartingPoints().get(i).getY(), i));
-//         }
+        outerloop: for (int i = 0; i < numleftover; i++) {
+            for (int section = 0; section < v.getNumSections(); section++) {
+                if (!seen.contains(section)) {
+                    lights.add(new G4Light(s.getStartingPoints().get(section)
+                            .getX(), s.getStartingPoints().get(section).getY(),
+                            i));
+                    seen.add(section);
+                    if (seen.size() == numLights) {
+                        break outerloop;
+                    }
+                }
+            }
+        }
+        // for (int i = 0; i < v.getNumSections() && lights.size() < numLights;
+        // i++) {
+        // lights.add(new G4Light(s.getStartingPoints().get(i).getX(), s
+        // .getStartingPoints().get(i).getY(), i));
+        // }
 
         return lights;
     }
@@ -215,44 +218,44 @@ public class VoronoiPlayer extends Player {
      */
     @Override
     public Collector getCollector() {
-    //	log.trace(s.getStartingPoints().toString());
-    	Point2D collect = pp.getCollectorPosition();
-    //	log.trace(collect.toString());
-    	
-    	s.setCollector(collect);
-    	return new Collector(collect.getX(), collect.getY());
+        // // log.trace(s.getStartingPoints().toString());
+        // Point2D collect = pp.getCollectorPosition();
+        // // log.trace(collect.toString());
+        //
+        // s.setCollector(collect);
+        // return new Collector(collect.getX(), collect.getY());
 
-//    	for(int i = 0; i < 50; i++) {
-//    		if (!intersectsWall(50, 50 + i)) {
-//    	    	log.trace("1 i: " + i);
-//    	    	s.setCollector(new Point2D.Double(50, 50 + i));
-//    			return new Collector(50, 50 + i);
-//    		}
-//    		if (!intersectsWall(50, 50 - i)) {
-//    	    	log.trace("2 i: " + i);
-//    	    	s.setCollector(new Point2D.Double(50, 50 - i));
-//    			return new Collector(50, 50 - i);
-//    		}
-//    		if (!intersectsWall(50 + i, 50)) {
-//    	    	log.trace("3 i: " + i);
-//    	    	s.setCollector(new Point2D.Double(50 + i, 50));
-//    			return new Collector(50 + i, 50);
-//    		}
-//    		if (!intersectsWall(50 - i, 50)) {
-//    	    	log.trace("4 i: " + i);
-//    	    	s.setCollector(new Point2D.Double(50 - i, 50));
-//    			return new Collector(50 - i, 50);
-//    		}
-//    	}
-//    	return new Collector(50, 50);
+        for (int i = 0; i < 50; i++) {
+            if (!intersectsWall(50, 50 + i)) {
+                log.trace("1 i: " + i);
+                s.setCollector(new Point2D.Double(50, 50 + i));
+                return new Collector(50, 50 + i);
+            }
+            if (!intersectsWall(50, 50 - i)) {
+                log.trace("2 i: " + i);
+                s.setCollector(new Point2D.Double(50, 50 - i));
+                return new Collector(50, 50 - i);
+            }
+            if (!intersectsWall(50 + i, 50)) {
+                log.trace("3 i: " + i);
+                s.setCollector(new Point2D.Double(50 + i, 50));
+                return new Collector(50 + i, 50);
+            }
+            if (!intersectsWall(50 - i, 50)) {
+                log.trace("4 i: " + i);
+                s.setCollector(new Point2D.Double(50 - i, 50));
+                return new Collector(50 - i, 50);
+            }
+        }
+        return new Collector(50, 50);
     }
-    
+
     private boolean intersectsWall(int x, int y) {
-		for(Line2D wall : walls) {
-			if(wall.intersects(x, y, 1, 1)) {
-				return true;
-			}
-		}
-		return false;
+        for (Line2D wall : walls) {
+            if (wall.intersects(x, y, 1, 1)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
