@@ -74,17 +74,19 @@ public class PositionPicker {
         	int section = 0;
 			for(int j = 0; j < v.getNumSections(); j++) {
 				int s1 = sections.getSection((int)collector.getX(), (int)collector.getY());
-				int s2 = sections.getSection((int) startingpoints.get(j).getX(), (int) startingpoints.get(j).getY());
-				SectionTuple<Integer, Integer> d = new SectionTuple(s1, s2);
-				if(seen.containsKey(d) && !seensections.contains(section) && seen.get(d) > maxdist) {
+//				int s2 = sections.getSection((int) startingpoints.get(j).getX(), (int) startingpoints.get(j).getY());
+				SectionTuple<Integer, Integer> d = new SectionTuple(s1, j);
+				if(seen.containsKey(d) && !seensections.contains(j) && seen.get(d) > maxdist) {
 					maxdist = seen.get(d);
-					section = s2;
+					section = j;
 				}
 			}
 			lights.add(new G4Light(startingpoints.get(section).getX(), startingpoints.get(section).getY(), i));
 			seensections.add(section);
 		}
 		
+        log.trace(lights.size());
+        
 		return lights;
 	}
 	

@@ -109,7 +109,8 @@ public class VoronoiPlayer extends Player {
     	
     	if (true) {
     		collectorpos = pp.getCollectorPosition();
-    		return pp.getLightPosition(numLights, collectorpos);
+    		lights = pp.getLightPosition(numLights, collectorpos);
+    		return lights;
     	}
         int[][] secboard = sections.getSectionBoard();
         HashSet<Integer> seen = new HashSet<Integer>();

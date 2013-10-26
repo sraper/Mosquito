@@ -461,7 +461,7 @@ public class Sweeper {
 	
 	private boolean intersectsWall(int x, int y) {
 		for(Line2D wall : walls) {
-			if(wall.intersects(x, y, 1, 1)) {
+			if(wall.intersects(x, y, 2, 1)) {
 				return true;
 			}
 		}
