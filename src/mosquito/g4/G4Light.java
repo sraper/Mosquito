@@ -93,6 +93,11 @@ public class G4Light extends MoveableLight {
     }
 
     public Point2D.Double getNextPoint() {
+    	for (Point2D p : path){
+    		log.trace(p.getX() + ", " + p.getY());
+
+    	}
+    	log.trace("NEW THING");
         if (pathIndex < path.size())
             return path.get(pathIndex);
         else

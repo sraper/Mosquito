@@ -21,7 +21,7 @@ public class AStar {
 	private static final Logger log = Logger.getLogger(VoronoiPlayer.class); // for
 
 	private double pointExtend(double m){
-		int c = 2;
+		double c = 0.05;
 		return Math.sqrt(Math.pow(c, 2)/(1+Math.pow(m,2)));
 	}
 	
@@ -30,7 +30,7 @@ public class AStar {
 		double x2 = wall.getX2();
 		double y1 = wall.getY1();
 		double y2 = wall.getY2();
-		int c = 1;
+		double c = 0.05;
 		log.trace("Before : " + wall.getP1() + " " + wall.getP2());
 		if (GeometryUtils.equals(x1, x2)){
 			if (y1 < y2)
@@ -40,17 +40,16 @@ public class AStar {
 			log.trace("After : " + wall.getP1() + " " + wall.getP2());
 			return wall;
 		}
-		if (GeometryUtils.equals(y1, y2)){
+	/*	if (GeometryUtils.equals(y1, y2)){
 			if (x1 < x2)
 				wall.setLine(new Point2D.Double(x1-c,y1), new Point2D.Double(x2+c,y2));
 			else
 				wall.setLine(new Point2D.Double(x1+c,y1), new Point2D.Double(x2-c,y2));
 			log.trace("After : " + wall.getP1() + " " + wall.getP2());
 			return wall;
-		}
+		}*/
 	
 		double m = (y2-y1)/(x2-x1);
-		log.trace("Before : " + wall.getP1() + " " + wall.getP2());
 		if (x1 < x2 && y1 < y2)
 			wall.setLine(new Point2D.Double(x1-pointExtend(m), y1-pointExtend(m)*m), new Point2D.Double(x2+pointExtend(m), y2+pointExtend(m)*m));
 		else if (x1 > x2 && y1 < y2)
@@ -66,7 +65,7 @@ public class AStar {
 	
 	public AStar(Set<Line2D> walls){
 		for (Line2D wall : walls){
-	//	wall = extendWall(wall);
+		wall = extendWall(wall);
 		}
 		this.walls = walls; 
 	
@@ -143,11 +142,11 @@ public class AStar {
 				ArrayList<Point2D.Double> finalPath = reconstructPath(cameFrom, current);
 				Point2D.Double firstPoint = finalPath.get(0);
 				
-				for (int i=0; i<12; i++)
+				for (int i=0; i<5; i++)
 					finalPath.add(0, firstPoint);
 				int i = 0;
 				while (i < finalPath.size()){
-					if (i % 30 == 0){
+					if (i % 18 == 0){
 						Point2D.Double random = finalPath.get(i);
 						for (int j=0;j<5;j++){
 							finalPath.add(i, random);
@@ -166,11 +165,16 @@ public class AStar {
 					score = maxout(score, Integer.MAX_VALUE);
 				for (Point nb2 : getNeighbors(neighbor)){
 					if (!Utils.hasStraightPath(neighbor, nb2, walls))
-						score = maxout(score, 100000);
-					for (Point nb3 : getNeighbors(nb2)){
+						score = maxout(score, Integer.MAX_VALUE/2);
+					/*for (Point nb3 : getNeighbors(nb2)){
 						if (!Utils.hasStraightPath(nb3, nb2, walls))
-							score = maxout(score, 10000);
-					}
+							score = maxout(score, 1000000);
+						for (Point nb4 : getNeighbors(nb3)){
+							if (!Utils.hasStraightPath(nb3, nb4, walls))
+								score = maxout(score, 100000);	
+						}
+						
+					} */
 				}
 				int neighbor_cost = maxout(current.score, score);
 				if (closedSet.contains(neighbor))
